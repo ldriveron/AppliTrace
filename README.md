@@ -24,6 +24,11 @@ Each job application keeps track of:
 - Benefits
 - Notes
 
+While on the Dashboard, users can search for applications by Position Title, Company Name, Status, and Location while at the same time deciding in what order the applications appear.
+This searching feature updates the applications without ever refreshing the page by using axios.
+
+Additionally, statistics indicators on the Dashboard show the user how their current week and month compares to their previous week and month in terms of positions applied for.
+
 ## Dashboard
 ![AppliTrace Dashboard](public/Screenshots/AppliTraceDashboardLightTheme.png)
 
@@ -40,7 +45,7 @@ Each job application keeps track of:
 ![AppliTrace Settings](public/Screenshots/AppliTraceSettings.png)
 
 ## Built With
-- Javascript (Node.js, Express.js, React JS)
+- Javascript (Node.js, Express.js, React JS, axios)
 - Passport.js for user authentication
 - HTML5, CSS3, Sass
 - MongoDB (Mongoose)

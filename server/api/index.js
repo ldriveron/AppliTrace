@@ -18,11 +18,16 @@ import ConfirmEmail from './ConfirmEmailHelper';
 // Return the current user's information
 router.get('/userdata', async (req, res) => {
 	if (req.isAuthenticated()) {
-		await User.findOne({ _id: req.user.id }).then((user) =>
+		await User.findOne({ _id: req.user.id }).then(async (user) => {
+			await user.updateOne({
+				last_activity: new Date().toLocaleDateString('en-US', { timeZone: user.timeZone })
+			});
+
 			res.send({
 				user: {
 					username: user.username,
 					email: user.email,
+					joindate: user.joindate,
 					occupation: user.occupation,
 					industry: user.industry,
 					desired_job_title: user.desired_job_title,
@@ -35,8 +40,8 @@ router.get('/userdata', async (req, res) => {
 					email_confirmed: user.email_confirmed,
 					private: user.private
 				}
-			})
-		);
+			});
+		});
 	} else {
 		res.redirect('/users/login');
 	}
@@ -51,11 +56,12 @@ router.get('/auth/init', async (req, res) => {
 	}
 });
 
-// Get all the user's jobapplications from MongoDB sorted by date
+// Get all the user's job applications from MongoDB sorted by date
 // If there are none, then respond with total_results: 0
-router.get('/jobs/all', (req, res) => {
+router.get('/jobs/all/:order', (req, res) => {
+	let order = req.params.order;
 	if (req.isAuthenticated()) {
-		Job.find({ user_id: req.user.id }).sort('-date_added').then((jobs) => {
+		Job.find({ user_id: req.user.id }).sort(order).then((jobs) => {
 			if (jobs.length !== 0) {
 				res.send({ total_results: jobs.length, results: jobs });
 			} else {
@@ -67,13 +73,57 @@ router.get('/jobs/all', (req, res) => {
 	}
 });
 
+// Search for job applications for the user based on search input from Dashboard
+// If none are found, then respond with total_results: 0
+router.get('/jobs/search/:term/:type/:order', (req, res) => {
+	if (req.isAuthenticated()) {
+		// Get term and type from url parameters
+		let term = req.params.term;
+		let type = req.params.type;
+		let order = req.params.order;
+
+		// If the user is searching for a term in all categories, then use the $or command
+		if (type == 'all') {
+			Job.find({
+				$or: [
+					{ company_name: { $regex: new RegExp(term, 'i') } },
+					{ title: { $regex: new RegExp(term, 'i') } },
+					{ status: { $regex: new RegExp(term, 'i') } },
+					{ location: { $regex: new RegExp(term, 'i') } }
+				]
+			})
+				.sort(order)
+				.then((apps) => {
+					if (apps.length !== 0) {
+						res.send({ total_results: apps.length, results: apps });
+					} else {
+						res.send({ total_results: 0 });
+					}
+				});
+		} else {
+			// If the user selects a certain category, then change the type in query
+			Job.find({ [type]: new RegExp(term, 'i') }).sort(order).then((apps) => {
+				if (apps.length !== 0) {
+					res.send({ total_results: apps.length, results: apps });
+				} else {
+					res.send({ total_results: 0 });
+				}
+			});
+		}
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
 // Add a job application for the user to MongoDB
 router.post('/userdata/newjob/:source', async (req, res) => {
 	if (req.isAuthenticated()) {
 		// Get the application data from the form
 		let {
+			source_url,
 			date_applied,
 			company_name,
+			company_website,
 			title,
 			location,
 			phone_number,
@@ -93,8 +143,10 @@ router.post('/userdata/newjob/:source', async (req, res) => {
 		const newJob = new Job({
 			user_id,
 			source,
+			source_url,
 			date_applied,
 			company_name,
+			company_website,
 			title,
 			location,
 			phone_number,

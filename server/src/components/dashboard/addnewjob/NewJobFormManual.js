@@ -9,7 +9,10 @@ const NewJobFormManual = (props) => (
 	<Formik
 		initialValues={{
 			date_applied: props.initialDate,
+			source: 'Manual',
+			source_url: '',
 			company_name: '',
+			company_website: '',
 			title: '',
 			location: '',
 			phone_number: '',
@@ -30,13 +33,27 @@ const NewJobFormManual = (props) => (
 				.min(10, 'Please use this format: mm/dd/yyyy')
 				.max(10, 'Please use this format: mm/dd/yyyy')
 				.matches(
-					/(0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])[- \/.](19|20)\d\d/,
+					/(0[1-9]|1[012])[\/](0[1-9]|[12][0-9]|3[01])[\/](19|20)\d\d/,
 					'Please use this format: mm/dd/yyyy'
 				),
 			title: Yup.string()
-				.required('Title is required')
-				.min(3, 'Title must be 3 characters or longer')
-				.max(60, 'Title must be 60 characters or less'),
+				.required('Position Title is required')
+				.min(3, 'Position Title must be 3 characters or longer')
+				.max(60, 'Position Title must be 60 characters or less'),
+			source_url: Yup.string()
+				.min(5, 'Link must be 5 characters or longer')
+				.max(200, 'Link must be 200 characters or less')
+				.matches(
+					/https:\/\/(www\.)?([-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))?/gi,
+					'A link in the proper format is required [https://(www.)example.com]'
+				),
+			company_website: Yup.string()
+				.min(5, 'Link must be 5 characters or longer')
+				.max(200, 'Link must be 200 characters or less')
+				.matches(
+					/https:\/\/(www\.)?([-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))?/gi,
+					'A link in the proper format is required [https://(www.)example.com]'
+				),
 			company_name: Yup.string()
 				.required('Company name is required')
 				.min(2, 'Company name must be 2 characters or longer')
@@ -60,7 +77,7 @@ const NewJobFormManual = (props) => (
 				.min(3, 'Enter at least three numbers')
 				.max(25, 'Salary cannot exceed 25 characters')
 				.matches(
-					/^(?!0+\.00)(?=.{1,9}(\.|$))(?!0(?!\.))\d{1,3}(,\d{3})*(\.\d+)?$/,
+					/^(?!0+\.00)(?=.{1,9}(\.|$))(?!0(?!\.))\d{1,3}(,\d{3})*(\.\d+)?[/y, /m]$/,
 					'Use this format example: 11,000'
 				),
 			benefits: Yup.string()
@@ -88,7 +105,7 @@ const NewJobFormManual = (props) => (
 						paddingBottom: '20px'
 					}}
 				>
-					<form action={'/api/userdata/newjob/Manual'} method="POST" style={{ width: '90%' }}>
+					<form action={'/api/userdata/newjob/' + values.source} method="POST" style={{ width: '90%' }}>
 						<h1>Enter Application Details</h1>
 						<div className="date_applied">
 							<label htmlFor="date_applied">Date Applied</label>
@@ -106,6 +123,92 @@ const NewJobFormManual = (props) => (
 							/>
 							{errors.date_applied &&
 							touched.date_applied && <div className="input_feedback">{errors.date_applied}</div>}
+						</div>
+						<br />
+						<div className="source">
+							<label htmlFor="source">Source</label>
+							<br />
+							<select
+								name="source"
+								id="source"
+								onChange={handleChange}
+								onBlur={handleBlur}
+								value={values.source}
+							>
+								<option key="Manual" value="Manual">
+									Manual
+								</option>
+								<option key="Indeed" value="Indeed">
+									Indeed
+								</option>
+								<option key="LinkedIn" value="LinkedIn">
+									LinkedIn
+								</option>
+								<option key="ZipRecruiter" value="ZipRecruiter">
+									ZipRecruiter
+								</option>
+								<option key="Snagajob" value="Snagajob">
+									Snagajob
+								</option>
+							</select>
+						</div>
+						<br />
+						<div className="source_url">
+							<label htmlFor="source_url">Source Link</label>
+							<br />
+							<input
+								type="text"
+								id="source_url"
+								name="source_url"
+								placeholder="Enter a link to the application"
+								value={values.source_url}
+								onChange={handleChange}
+								onBlur={handleBlur}
+								className={errors.source_url && touched.source_url && 'error'}
+								required
+							/>
+							{errors.source_url &&
+							touched.source_url && <div className="input_feedback">{errors.source_url}</div>}
+						</div>
+						<br />
+						<div className="status">
+							<label htmlFor="status">Status</label>
+							<br />
+							<select
+								name="status"
+								id="status"
+								onChange={handleChange}
+								onBlur={handleBlur}
+								value={values.status}
+							>
+								<option key="Applied" value="Applied">
+									Applied
+								</option>
+								<option key="Viewed" value="Viewed">
+									Viewed
+								</option>
+								<option key="Under Review" value="Under Review">
+									Under Review
+								</option>
+								<option key="Contacted" value="Contacted">
+									Contacted
+								</option>
+								<option key="Screening Interview" value="Screening Interview">
+									Screening Interview
+								</option>
+								<option key="Technical Interview" value="Technical Interview">
+									Technical Interview
+								</option>
+								<option key="Offer" value="Offer">
+									Offer
+								</option>
+								<option key="Rejected" value="Rejected">
+									Rejected
+								</option>
+								<option key="Declined Offer" value="Declined Offer">
+									Declined Offer
+								</option>
+							</select>
 						</div>
 						<br />
 						<div className="company_name">
@@ -126,6 +229,24 @@ const NewJobFormManual = (props) => (
 							touched.company_name && <div className="input_feedback">{errors.company_name}</div>}
 						</div>
 						<br />
+						<div className="company_website">
+							<label htmlFor="company_website">Company Website</label>
+							<br />
+							<input
+								type="text"
+								id="company_website"
+								name="company_website"
+								placeholder="Enter the company's website"
+								value={values.company_website}
+								onChange={handleChange}
+								onBlur={handleBlur}
+								className={errors.company_website && touched.company_website && 'error'}
+								required
+							/>
+							{errors.company_website &&
+							touched.company_website && <div className="input_feedback">{errors.company_website}</div>}
+						</div>
+						<br />
 						<div className="title">
 							<label htmlFor="title">Position Title</label>
 							<br />
@@ -144,7 +265,7 @@ const NewJobFormManual = (props) => (
 						</div>
 						<br />
 						<div className="location">
-							<label htmlFor="location">Location</label>
+							<label htmlFor="location">Location or remote</label>
 							<br />
 							<input
 								type="text"
@@ -158,40 +279,6 @@ const NewJobFormManual = (props) => (
 							/>
 							{errors.location &&
 							touched.location && <div className="input_feedback">{errors.location}</div>}
-						</div>
-						<br />
-						<div className="status">
-							<label htmlFor="status">Status</label>
-							<br />
-							<select
-								name="status"
-								id="status"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								value={values.status}
-							>
-								<option key="Applied" value="Applied">
-									Applied
-								</option>
-								<option key="Contacted" value="Contacted">
-									Contacted
-								</option>
-								<option key="Screening Interview" value="Screening Interview">
-									Screening Interview
-								</option>
-								<option key="Technical Interview" value="Technical Interview">
-									Technical Interview
-								</option>
-								<option key="Offer" value="Offer">
-									Offer
-								</option>
-								<option key="Rejected" value="Rejected">
-									Rejected
-								</option>
-								<option key="Declired Offer" value="Contacted">
-									Declined Offer
-								</option>
-							</select>
 						</div>
 						<br />
 						<div className="recruiter_name">
@@ -262,7 +349,7 @@ const NewJobFormManual = (props) => (
 						</div>
 						<br />
 						<div className="description">
-							<label htmlFor="description">Description</label>
+							<label htmlFor="description">Description/Summary</label>
 							<br />
 							<textarea
 								type="text"
@@ -327,6 +414,8 @@ const NewJobFormManual = (props) => (
 									errors.salary ||
 									errors.benefits ||
 									errors.description ||
+									errors.source_url ||
+									errors.company_website ||
 									isSubmitting
 								}
 							>

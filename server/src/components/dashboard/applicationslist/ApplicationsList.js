@@ -10,6 +10,7 @@ const ApplicationsList = (props) => {
 	// Loop through the object containing the applications
 	// Add each application to the apps array
 	for (let app = 0; app < props.list.results.length; app++) {
+		// Increase app number because inserting application to array
 		app_number++;
 
 		apps.push(
@@ -25,7 +26,7 @@ const ApplicationsList = (props) => {
 						<div className="app_number">{props.list.results[app].status}</div>
 					</div>
 					<div className="info">
-						<div className="label">Title</div>
+						<div className="label">Position Title</div>
 						<div className="app_number">
 							{props.list.results[app].title.length > 40 ? (
 								props.list.results[app].title.substring(0, 40) + '...'
@@ -56,7 +57,8 @@ const ApplicationsList = (props) => {
 };
 
 ApplicationsList.propTypes = {
-	list: PropTypes.object
+	list: PropTypes.object,
+	search_term: PropTypes.string
 };
 
 export default ApplicationsList;

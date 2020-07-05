@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
+
+// FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Header = (props) => {
@@ -37,12 +39,6 @@ const Header = (props) => {
 				</span>
 				<span className="link_name">Dashboard</span>
 			</NavLink>
-			<NavLink key="events" to="/users/events" className="links_holder" activeClassName="link_active">
-				<span className="link_icon">
-					<FontAwesomeIcon icon="calendar" />
-				</span>
-				<span className="link_name">Events</span>
-			</NavLink>
 			<NavLink key="notes" to="/users/notes" className="links_holder" activeClassName="link_active">
 				<span className="link_icon">
 					<FontAwesomeIcon icon="sticky-note" />
@@ -54,6 +50,12 @@ const Header = (props) => {
 					<FontAwesomeIcon icon="id-badge" />
 				</span>
 				<span className="link_name">Contacts</span>
+			</NavLink>
+			<NavLink key="events" to="/users/events" className="links_holder" activeClassName="link_active">
+				<span className="link_icon">
+					<FontAwesomeIcon icon="calendar" />
+				</span>
+				<span className="link_name">Events</span>
 			</NavLink>
 			<NavLink key="settings" to="/users/settings/profile" className="links_holder" activeClassName="link_active">
 				<span className="link_icon">

@@ -20,9 +20,22 @@ import {
 	faStickyNote,
 	faIdBadge,
 	faSlidersH,
-	faSignOutAlt
+	faSignOutAlt,
+	faChevronCircleUp,
+	faChevronCircleDown,
+	faChevronCircleRight
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faStream, faCalendar, faStickyNote, faIdBadge, faSlidersH, faSignOutAlt);
+library.add(
+	faStream,
+	faCalendar,
+	faStickyNote,
+	faIdBadge,
+	faSlidersH,
+	faSignOutAlt,
+	faChevronCircleUp,
+	faChevronCircleDown,
+	faChevronCircleRight
+);
 
 // API methods import
 import * as api from '../api';
@@ -32,11 +45,14 @@ class App extends Component {
 	state = {
 		user_id: '',
 		isLoggedIn: false,
-		user_data: {}
+		user_data: {},
+		search_term: null,
+		search_type: 'all',
+		search_order: '-date_added'
 	};
 
 	componentDidMount() {
-		api.authUser().then((resp) => {
+		api.authUser().then(async (resp) => {
 			if (resp.id) {
 				this.setState({
 					user_id: resp.id,
@@ -44,7 +60,7 @@ class App extends Component {
 				});
 
 				// Fetch user data after their ID is retreived
-				api
+				await api
 					.fetchUser()
 					.then((resp) => {
 						this.setState({
@@ -52,6 +68,7 @@ class App extends Component {
 								user_id: this.state.user_id,
 								username: resp.user.username,
 								email: resp.user.email,
+								joindate: resp.user.joindate,
 								occupation: resp.user.occupation,
 								industry: resp.user.industry,
 								desired_job_title: resp.user.desired_job_title,
@@ -67,12 +84,72 @@ class App extends Component {
 						});
 					})
 					.catch(console.error);
+
+				// Fetch all of the users applications and set the state
+				await api.fetchAllJobs(this.state.search_order).then((resp) => {
+					this.setState({
+						apps_list: resp
+					});
+				});
 			} else {
 				this.setState({
 					isLoggedIn: false
 				});
 			}
 		});
+	}
+
+	// Handle search input from user
+	handleSearch(term) {
+		// If the search text input is not empty, then update the applications list
+		// If it is empty, then get all applications list again
+		if (this.state.search_term != term && term != '' && /^[a-z0-9]+$/i.test(term)) {
+			api.fetchJobBySearch(term, this.state.search_type, this.state.search_order).then((resp) => {
+				this.setState({
+					apps_list: resp,
+					search_term: term
+				});
+			});
+		} else if (term == '') {
+			api.fetchAllJobs(this.state.search_order).then((resp) => {
+				this.setState({
+					apps_list: resp,
+					search_term: null
+				});
+			});
+		}
+	}
+
+	// Handle search type change from user
+	handleSearchTypeChange(type) {
+		// If the search text input is not empty, then update the applications list
+		// else, just update the search type
+		if (this.state.search_term != null && this.state.search_term != '') {
+			api.fetchJobBySearch(this.state.search_term, type, this.state.search_order).then((resp) => {
+				this.setState({
+					apps_list: resp,
+					search_type: type
+				});
+			});
+		} else {
+			this.setState({ search_type: type });
+		}
+	}
+
+	// Handle search order change from user
+	handleSearchOrderChange(order) {
+		if (this.state.search_term != null && this.state.search_term != '') {
+			api.fetchJobBySearch(this.state.search_term, this.state.search_type, order).then((resp) => {
+				this.setState({
+					apps_list: resp,
+					search_order: order
+				});
+			});
+		} else {
+			api.fetchAllJobs(order).then((resp) => {
+				this.setState({ apps_list: resp, search_order: order });
+			});
+		}
 	}
 
 	// Use diffrent Routes for react based on if the user is authenticated
@@ -83,12 +160,24 @@ class App extends Component {
 					<Header isLoggedIn={this.state.isLoggedIn} user_data={this.state.user_data} />
 				)}
 
-				{this.state.user_data.user_id ? (
+				{this.state.user_data.user_id && this.state.apps_list ? (
 					<Switch>
 						<Route
 							path="/users/dashboard"
 							exact
-							render={(props) => <Dashboard {...props} user_data={this.state.user_data} />}
+							render={(props) => (
+								<Dashboard
+									{...props}
+									user_data={this.state.user_data}
+									apps_list={this.state.apps_list}
+									search_term={this.state.search_term}
+									search_type={this.state.search_type}
+									search_order={this.state.search_order}
+									handleSearch={this.handleSearch.bind(this)}
+									handleSearchOrderChange={this.handleSearchOrderChange.bind(this)}
+									handleSearchTypeChange={this.handleSearchTypeChange.bind(this)}
+								/>
+							)}
 						/>
 						<Route
 							path="/users/settings"

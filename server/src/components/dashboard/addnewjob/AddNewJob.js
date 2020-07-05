@@ -10,9 +10,13 @@ const AddNewJob = () => {
 	let [ urlregex, setUrlRegex ] = useState(new RegExp());
 
 	// Close the form if one is currently open
+	// Also hide applications list div when adding a new application
 	function setClose() {
 		if (jobType != null) {
 			setJobType(null);
+			document.getElementById('apps').style.display = 'initial';
+		} else {
+			document.getElementById('apps').style.display = 'none';
 		}
 	}
 
