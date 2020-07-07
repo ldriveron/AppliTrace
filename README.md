@@ -29,6 +29,10 @@ This searching feature updates the applications without ever refreshing the page
 
 Additionally, statistics indicators on the Dashboard show the user how their current week and month compares to their previous week and month in terms of positions applied for.
 
+The Notes section compiles notes from applications and single notes entered by the user. A search bar makes navigating through the notes easier.
+
+The Contacts section allows the user to save contacts with related information for future reference. A search bar makes finding a contact easier.
+
 ## Dashboard
 ![AppliTrace Dashboard](public/Screenshots/AppliTraceDashboardLightTheme.png)
 
@@ -40,6 +44,12 @@ Additionally, statistics indicators on the Dashboard show the user how their cur
 
 ## Add Job Application From Indeed
 ![AppliTrace Add Job Applicaiton From Indeed](public/Screenshots/AppliTraceAddJobIndeed.png)
+
+## Notes
+![AppliTrace Settings](public/Screenshots/AppliTraceNotes.png)
+
+## Contacts
+![AppliTrace Settings](public/Screenshots/AppliTraceContacts.png)
 
 ## Settings
 ![AppliTrace Settings](public/Screenshots/AppliTraceSettings.png)

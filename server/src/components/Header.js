@@ -51,12 +51,6 @@ const Header = (props) => {
 				</span>
 				<span className="link_name">Contacts</span>
 			</NavLink>
-			<NavLink key="events" to="/users/events" className="links_holder" activeClassName="link_active">
-				<span className="link_icon">
-					<FontAwesomeIcon icon="calendar" />
-				</span>
-				<span className="link_name">Events</span>
-			</NavLink>
 			<NavLink key="settings" to="/users/settings/profile" className="links_holder" activeClassName="link_active">
 				<span className="link_icon">
 					<FontAwesomeIcon icon="sliders-h" />

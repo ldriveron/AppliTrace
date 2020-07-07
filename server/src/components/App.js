@@ -9,7 +9,8 @@ import Header from './Header';
 
 // Dashboard imports
 import Dashboard from './dashboard/Dashboard';
-import WeekView from './weekview/WeekView';
+import Notes from './notes/Notes';
+import Contacts from './contacts/Contacts';
 import Settings from './settings/Settings';
 
 // Font-awesome react
@@ -23,7 +24,11 @@ import {
 	faSignOutAlt,
 	faChevronCircleUp,
 	faChevronCircleDown,
-	faChevronCircleRight
+	faChevronCircleRight,
+	faBuilding,
+	faPhoneSquareAlt,
+	faMapPin,
+	faAt
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
 	faStream,
@@ -34,7 +39,11 @@ library.add(
 	faSignOutAlt,
 	faChevronCircleUp,
 	faChevronCircleDown,
-	faChevronCircleRight
+	faChevronCircleRight,
+	faBuilding,
+	faPhoneSquareAlt,
+	faMapPin,
+	faAt
 );
 
 // API methods import
@@ -162,6 +171,7 @@ class App extends Component {
 
 				{this.state.user_data.user_id && this.state.apps_list ? (
 					<Switch>
+						{/* Dashboard route */}
 						<Route
 							path="/users/dashboard"
 							exact
@@ -179,23 +189,46 @@ class App extends Component {
 								/>
 							)}
 						/>
+
+						{/* Notes route */}
+						<Route
+							path="/users/notes"
+							exact
+							render={(props) => (
+								<Notes {...props} user_data={this.state.user_data} apps_list={this.state.apps_list} />
+							)}
+						/>
+
+						{/* Contacts route */}
+						<Route
+							path="/users/contacts"
+							exact
+							render={(props) => (
+								<Contacts
+									{...props}
+									user_data={this.state.user_data}
+									apps_list={this.state.apps_list}
+									search_term={this.state.search_term}
+									search_type={this.state.search_type}
+									search_order={this.state.search_order}
+									handleSearch={this.handleSearch.bind(this)}
+									handleSearchOrderChange={this.handleSearchOrderChange.bind(this)}
+									handleSearchTypeChange={this.handleSearchTypeChange.bind(this)}
+								/>
+							)}
+						/>
+
+						{/* Settings route */}
 						<Route
 							path="/users/settings"
 							render={(props) => <Settings {...props} user_data={this.state.user_data} />}
 						/>
-
-						{/* <Route
-							path="/users/overview"
-							render={(props) => <Overview {...props} user_data={this.state.user_data} />}
-						/> */}
-						{/* <Route path="/:username" render={(props) => <PublicOverview {...props} />} /> */}
 					</Switch>
 				) : (
 					<Switch>
 						<Route path="/users/login" exact component={LoginForm} />
 						<Route path="/users/register" exact component={RegisterForm} />
 						<Route path="/" exact component={StartingPage} />
-						{/* <Route path="/:username" exact render={(props) => <PublicOverview {...props} />} /> */}
 					</Switch>
 				)}
 			</Router>

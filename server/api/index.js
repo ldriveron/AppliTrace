@@ -7,6 +7,8 @@ const router = express.Router();
 // MongoDB models for api search
 import User from '../models/User';
 import Job from '../models/Job';
+import Note from '../models/Note';
+import Contact from '../models/Contact';
 
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
@@ -167,7 +169,203 @@ router.post('/userdata/newjob/:source', async (req, res) => {
 			await user.updateOne({ job_applications_total: user.job_applications_total + 1 });
 		});
 
-		req.flash('user_alert', 'Job application added');
+		req.flash('user_alert', 'Job application has been added');
+		res.redirect('/users/dashboard');
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
+// Edit a job application for the user on MongoDB
+router.post('/userdata/editjob/:id', async (req, res) => {
+	if (req.isAuthenticated()) {
+		let appid = req.params.id;
+		// Get the application data from the form
+		let {
+			source_url,
+			date_applied,
+			company_name,
+			company_website,
+			title,
+			location,
+			phone_number,
+			email_address,
+			recruiter_name,
+			notes,
+			status,
+			salary,
+			benefits,
+			description
+		} = req.body;
+
+		// Add job application information to database
+		await Job.findOne({ _id: appid }).then(async (app) => {
+			if (app.user_id == req.user.id) {
+				await app.updateOne({
+					source_url: source_url,
+					date_applied: date_applied,
+					company_name: company_name,
+					company_website: company_website,
+					title: title,
+					location: location,
+					phone_number: phone_number,
+					email_address: email_address,
+					recruiter_name: recruiter_name,
+					notes: notes,
+					status: status,
+					salary: salary,
+					benefits: benefits,
+					description: description
+				});
+			}
+		});
+
+		req.flash('user_alert', 'Job application has been edited');
+		res.redirect('/users/dashboard');
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
+// Delete a job application for the user on MongoDB
+router.post('/userdata/deletejob/:id', async (req, res) => {
+	if (req.isAuthenticated()) {
+		let appid = req.params.id;
+		// Add job application information to database
+		await Job.findOneAndDelete({ _id: appid }).then(async () => {
+			await User.findOne({ _id: req.user.id }).then(async (user) => {
+				await user.updateOne({ job_applications_total: user.job_applications_total - 1 });
+			});
+		});
+
+		req.flash('user_alert', 'Job application has been deleted');
+		res.redirect('/users/dashboard');
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
+// Get all notes
+router.get('/userdata/notes/:term', (req, res) => {
+	if (req.isAuthenticated()) {
+		let term = req.params.term;
+
+		if (term != 'null') {
+			Note.find({
+				$or: [ { note: { $regex: new RegExp(term, 'i') } }, { title: { $regex: new RegExp(term, 'i') } } ],
+				$and: [ { user_id: req.user.id } ]
+			}).then((notes) => {
+				if (notes.length !== 0) {
+					res.send({ total_results: notes.length, results: notes });
+				} else {
+					res.send({ total_results: 0 });
+				}
+			});
+		} else {
+			Note.find({ user_id: req.user.id }).then((notes) => {
+				if (notes.length !== 0) {
+					res.send({ total_results: notes.length, results: notes });
+				} else {
+					res.send({ total_results: 0 });
+				}
+			});
+		}
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
+// Add a note
+router.post('/userdata/addnote', async (req, res) => {
+	if (req.isAuthenticated()) {
+		let title = req.body.title;
+		let note = req.body.note;
+		let user_id = req.user.id;
+
+		const newNote = new Note({ user_id, title, note });
+
+		await newNote.save().catch(console.error);
+
+		req.flash('user_alert', 'New note has been added');
+		res.redirect('/users/dashboard');
+	}
+});
+
+// Delete a note
+router.post('/userdata/deletenote/:noteid', async (req, res) => {
+	if (req.isAuthenticated()) {
+		let noteid = req.params.noteid;
+
+		await Note.findOneAndDelete({ _id: noteid });
+
+		req.flash('user_alert', 'Note has been deleted');
+		res.redirect('/users/dashboard');
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
+// Get all contacts
+router.get('/userdata/contacts/:term', (req, res) => {
+	if (req.isAuthenticated()) {
+		let term = req.params.term;
+
+		if (term != 'null') {
+			Contact.find({
+				$or: [
+					{ name: { $regex: new RegExp(term, 'i') } },
+					{ associated_company: { $regex: new RegExp(term, 'i') } },
+					{ location: { $regex: new RegExp(term, 'i') } }
+				],
+				$and: [ { user_id: req.user.id } ]
+			}).then((contacts) => {
+				if (contacts.length !== 0) {
+					res.send({ total_results: contacts.length, results: contacts });
+				} else {
+					res.send({ total_results: 0 });
+				}
+			});
+		} else {
+			Contact.find({ user_id: req.user.id }).then((contacts) => {
+				if (contacts.length !== 0) {
+					res.send({ total_results: contacts.length, results: contacts });
+				} else {
+					res.send({ total_results: 0 });
+				}
+			});
+		}
+	} else {
+		res.redirect('/users/login');
+	}
+});
+
+// Add a contact
+router.post('/userdata/addcontact', async (req, res) => {
+	if (req.isAuthenticated()) {
+		let user_id = req.user.id;
+		let name = req.body.name;
+		let location = req.body.location;
+		let phone_number = req.body.phone_number;
+		let email_address = req.body.email_address;
+		let associated_company = req.body.associated_company;
+
+		const newContact = new Contact({ user_id, associated_company, location, phone_number, email_address, name });
+
+		await newContact.save().catch(console.error);
+
+		req.flash('user_alert', 'New contact has been added');
+		res.redirect('/users/dashboard');
+	}
+});
+
+// Delete a contact
+router.post('/userdata/deletecontact/:contactid', async (req, res) => {
+	if (req.isAuthenticated()) {
+		let contactid = req.params.contactid;
+
+		await Contact.findOneAndDelete({ _id: contactid });
+
+		req.flash('user_alert', 'Contact has been deleted');
 		res.redirect('/users/dashboard');
 	} else {
 		res.redirect('/users/login');

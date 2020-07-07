@@ -22,7 +22,7 @@ class Dashboard extends Component {
 
 	componentDidMount() {
 		let today = new Date();
-		let this_month = today.getMonth() + 1;
+		let this_month = today.getMonth() == 11 ? 1 : today.getMonth() + 1;
 
 		this.calculateWeekanMonthStats(today, this_month);
 
@@ -35,11 +35,11 @@ class Dashboard extends Component {
 
 		// Get the sunday from last week
 		let last_week_start = new Date();
-		last_week_start.setDate(this_week_start.getDay() - 9);
+		last_week_start.setDate(this_week_start.getDate() - 7);
 
 		// Calculate the last day of the current week (sunday to sunday)
-		let week_end = new Date();
-		week_end.setDate(this_week_start.getDay() + 4);
+		let this_week_end = new Date();
+		this_week_end.setDate(this_week_start.getDate() + 6);
 
 		// Last week's sunday
 		let second_week_end = new Date(last_week_start.getTime());
@@ -63,7 +63,8 @@ class Dashboard extends Component {
 			if (
 				(application_date >= this_week_start ||
 					application_date.toLocaleDateString() == this_week_start.toLocaleDateString()) &&
-				(application_date <= week_end || application_date.toLocaleDateString() == week_end.toLocaleDateString())
+				(application_date <= this_week_end ||
+					application_date.toLocaleDateString() == this_week_end.toLocaleDateString())
 			) {
 				this_week_total++;
 			}
@@ -78,12 +79,16 @@ class Dashboard extends Component {
 				last_week_total++;
 			}
 
-			// Count how many applications sent during the previous month
-			if (application_date.getMonth() + 1 == this_month) {
+			// Count how many applications sent during the current month
+			if ((application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) == this_month) {
 				this_month_total++;
 			}
 
-			if (application_date.getMonth() + 1 == this_month - 1) {
+			// Count how many applications sent during the previous month
+			if (
+				(application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) ==
+				(this_month == 1 ? 12 : this_month - 1)
+			) {
 				last_month_total++;
 			}
 		}
@@ -238,23 +243,33 @@ class Dashboard extends Component {
 									<div className="percent_change">Since {this.props.user_data.joindate}</div>
 								</div>
 								<div className="user_stat">
-									<div className="type">Total This Week</div>
-									<div className="count">{this.state.total_this_week}</div>
-									<div className={week_percent_class}>
-										<span style={{ marginRight: '5px' }}>
-											<FontAwesomeIcon icon={week_percent_icon} />
+									<div className="tooltip bottom">
+										<div className="type">Total This Week</div>
+										<div className="count">{this.state.total_this_week}</div>
+										<div className={week_percent_class}>
+											<span style={{ marginRight: '5px' }}>
+												<FontAwesomeIcon icon={week_percent_icon} />
+											</span>
+											{week_plus_or_minus + this.state.difference_between_weeks}%
+										</div>
+										<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
+											Compared to {this.state.last_week_total} last week
 										</span>
-										{week_plus_or_minus + this.state.difference_between_weeks}%
 									</div>
 								</div>
 								<div className="user_stat">
-									<div className="type">Total This Month</div>
-									<div className="count">{this.state.total_this_month}</div>
-									<div className={month_percent_class}>
-										<span style={{ marginRight: '5px' }}>
-											<FontAwesomeIcon icon={month_percent_icon} />
+									<div className="tooltip bottom">
+										<div className="type">Total This Month</div>
+										<div className="count">{this.state.total_this_month}</div>
+										<div className={month_percent_class}>
+											<span style={{ marginRight: '5px' }}>
+												<FontAwesomeIcon icon={month_percent_icon} />
+											</span>
+											{month_plus_or_minus + this.state.difference_between_months}%
+										</div>
+										<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
+											Compared to {this.state.total_last_month} last month
 										</span>
-										{month_plus_or_minus + this.state.difference_between_months}%
 									</div>
 								</div>
 							</div>
@@ -270,7 +285,7 @@ class Dashboard extends Component {
 							)}
 						</div>
 					) : (
-						<div className="month_loader" />
+						<div className="apps_loader" />
 					)}
 				</div>
 			</div>

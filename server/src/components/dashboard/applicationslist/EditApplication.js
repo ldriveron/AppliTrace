@@ -5,24 +5,25 @@ import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-const NewJobFormManual = (props) => (
+const EditApplication = (props) => (
 	<Formik
 		initialValues={{
-			date_applied: props.initialDate,
-			source: 'Manual',
-			source_url: '',
-			company_name: '',
-			company_website: '',
-			title: '',
-			location: '',
-			phone_number: '',
-			email_address: '',
-			recruiter_name: '',
-			notes: '',
-			status: 'Applied',
-			salary: '',
-			benefits: '',
-			description: ''
+			date_applied: props.application.date_applied == null ? '' : props.application.date_applied,
+			source: props.application.source == null ? '' : props.application.source,
+			source_url: props.application.source_url == null ? '' : props.application.source_url,
+			company_name: props.application.company_name == null ? '' : props.application.company_name,
+			company_website: props.application.company_website == null ? '' : props.application.company_website,
+			title: props.application.title == null ? '' : props.application.title,
+			location: props.application.location == null ? '' : props.application.location,
+			phone_number: props.application.phone_number == null ? '' : props.application.phone_number,
+			email_address: props.application.email_address == null ? '' : props.application.email_address,
+			recruiter_name: props.application.recruiter_name == null ? '' : props.application.recruiter_name,
+			notes: props.application.notes == null ? '' : props.application.notes,
+			status: props.application.status == null ? '' : props.application.status,
+			salary: props.application.salary == null ? '' : props.application.salary,
+			benefits: props.application.benefits == null ? '' : props.application.benefits,
+			description: props.application.description == null ? '' : props.application.description,
+			application_id: props.application._id.toString()
 		}}
 		onSubmit={(values, { setSubmitting }) => {
 			setSubmitting(false);
@@ -102,8 +103,12 @@ const NewJobFormManual = (props) => (
 						paddingBottom: '20px'
 					}}
 				>
-					<form action={'/api/userdata/newjob/' + values.source} method="POST" style={{ width: '90%' }}>
-						<h1>Enter Application Details</h1>
+					<form
+						action={'/api/userdata/editjob/' + values.application_id}
+						method="POST"
+						style={{ width: '90%' }}
+					>
+						<h1>View/Edit Your Application To {values.company_name}</h1>
 						<div className="date_applied">
 							<label htmlFor="date_applied">Date Applied</label>
 							<br />
@@ -218,7 +223,7 @@ const NewJobFormManual = (props) => (
 								onChange={handleChange}
 								onBlur={handleBlur}
 								className={errors.company_name && touched.company_name && 'error'}
-								placeholder="Enter a company name"
+								placeholder="Enter an company name"
 								required
 							/>
 							{errors.company_name &&
@@ -321,7 +326,7 @@ const NewJobFormManual = (props) => (
 								onChange={handleChange}
 								onBlur={handleBlur}
 								className={errors.email_address && touched.email_address && 'error'}
-								placeholder="Enter an email address for the company"
+								placeholder="Enter an email for the company"
 							/>
 							{errors.email_address &&
 							touched.email_address && <div className="input_feedback">{errors.email_address}</div>}
@@ -414,7 +419,7 @@ const NewJobFormManual = (props) => (
 									isSubmitting
 								}
 							>
-								Add Application
+								Edit Application
 							</button>
 						</div>
 					</form>
@@ -424,9 +429,9 @@ const NewJobFormManual = (props) => (
 	</Formik>
 );
 
-NewJobFormManual.propTypes = {
+EditApplication.propTypes = {
 	values: PropTypes.object,
-	initialDate: PropTypes.string,
+	application: PropTypes.object,
 	touched: PropTypes.object,
 	errors: PropTypes.object,
 	isSubmitting: PropTypes.bool,
@@ -434,4 +439,4 @@ NewJobFormManual.propTypes = {
 	handleBlur: PropTypes.func
 };
 
-export default NewJobFormManual;
+export default EditApplication;
