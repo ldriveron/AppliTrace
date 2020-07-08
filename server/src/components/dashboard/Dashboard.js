@@ -54,42 +54,44 @@ class Dashboard extends Component {
 		let last_month_total = 0;
 
 		// Loop through all applications
-		for (let app = 0; app < this.props.apps_list.results.length; app++) {
-			var application_date = new Date(this.props.apps_list.results[app].date_applied);
+		if (this.props.apps_list.total_results != 0) {
+			for (let app = 0; app < this.props.apps_list.results.length; app++) {
+				var application_date = new Date(this.props.apps_list.results[app].date_applied);
 
-			// Count how many applications sent during the current week
-			// Exact dates for some reason are not considered qual when using just the Date object
-			// Using .toLocalDateString() for those cases
-			if (
-				(application_date >= this_week_start ||
-					application_date.toLocaleDateString() == this_week_start.toLocaleDateString()) &&
-				(application_date <= this_week_end ||
-					application_date.toLocaleDateString() == this_week_end.toLocaleDateString())
-			) {
-				this_week_total++;
-			}
+				// Count how many applications sent during the current week
+				// Exact dates for some reason are not considered qual when using just the Date object
+				// Using .toLocalDateString() for those cases
+				if (
+					(application_date >= this_week_start ||
+						application_date.toLocaleDateString() == this_week_start.toLocaleDateString()) &&
+					(application_date <= this_week_end ||
+						application_date.toLocaleDateString() == this_week_end.toLocaleDateString())
+				) {
+					this_week_total++;
+				}
 
-			// Check how many applications the user has for the previous week
-			if (
-				(application_date >= last_week_start ||
-					application_date.toLocaleDateString() == last_week_start.toLocaleDateString()) &&
-				(application_date <= second_week_end ||
-					application_date.toLocaleDateString() == second_week_end.toLocaleDateString())
-			) {
-				last_week_total++;
-			}
+				// Check how many applications the user has for the previous week
+				if (
+					(application_date >= last_week_start ||
+						application_date.toLocaleDateString() == last_week_start.toLocaleDateString()) &&
+					(application_date <= second_week_end ||
+						application_date.toLocaleDateString() == second_week_end.toLocaleDateString())
+				) {
+					last_week_total++;
+				}
 
-			// Count how many applications sent during the current month
-			if ((application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) == this_month) {
-				this_month_total++;
-			}
+				// Count how many applications sent during the current month
+				if ((application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) == this_month) {
+					this_month_total++;
+				}
 
-			// Count how many applications sent during the previous month
-			if (
-				(application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) ==
-				(this_month == 1 ? 12 : this_month - 1)
-			) {
-				last_month_total++;
+				// Count how many applications sent during the previous month
+				if (
+					(application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) ==
+					(this_month == 1 ? 12 : this_month - 1)
+				) {
+					last_month_total++;
+				}
 			}
 		}
 
@@ -169,7 +171,7 @@ class Dashboard extends Component {
 		return (
 			<div className="dashboard">
 				<WeekView />
-				<AddNewJob />
+				<AddNewJob total_results={this.props.apps_list.total_results} />
 				<div className="in_content">
 					{/* Show list of applications when loaded */}
 					{/* If the user has not added any applications, then display a message */}

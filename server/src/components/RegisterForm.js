@@ -12,7 +12,6 @@ const RegisterForm = () => (
 	<Formik
 		initialValues={{
 			username: '',
-			email: '',
 			industry: '',
 			occupation: '',
 			country: '',
@@ -28,7 +27,12 @@ const RegisterForm = () => (
 				.required('Username is required')
 				.min(3, 'Username must be 3 characters or longer')
 				.max(15, 'Username must be 15 characters or less'),
-			email: Yup.string().required('Email is required').email('Email is not valid'),
+			industry: Yup.string()
+				.min(3, 'Industry must be 3 characters or longer')
+				.max(70, 'Industry must be 70 characters or less'),
+			occupation: Yup.string()
+				.min(3, 'Occupation must be 3 characters or longer')
+				.max(15, 'Occupation must be 150 characters or less'),
 			password: Yup.string()
 				.required('Password is required')
 				.min(8, 'Password must be 8 characters or longer')
@@ -102,23 +106,6 @@ const RegisterForm = () => (
 								touched.username && <div className="input_feedback">{errors.username}</div>}
 							</div>
 							<br />
-							<div className="email">
-								<label htmlFor="email">Email</label>
-								<br />
-								<input
-									type="text"
-									id="email"
-									name="email"
-									value={values.email}
-									onChange={handleChange}
-									onBlur={handleBlur}
-									className={errors.email && touched.email && 'error'}
-									placeholder="Enter an Email"
-									required
-								/>
-								{errors.email && touched.email && <div className="input_feedback">{errors.email}</div>}
-							</div>
-							<br />
 							<div className="password">
 								<label htmlFor="password">Password</label>
 								<br />
@@ -166,9 +153,12 @@ const RegisterForm = () => (
 									name="industry"
 									value={values.industry}
 									onChange={handleChange}
+									className={errors.industry && touched.industry && 'error'}
 									onBlur={handleBlur}
 									placeholder="Enter your desired industry"
 								/>
+								{errors.industry &&
+								touched.industry && <div className="input_feedback">{errors.industry}</div>}
 							</div>
 
 							<div className="Occupation" style={{ width: '250px', float: 'left', marginLeft: '50px' }}>
@@ -180,9 +170,12 @@ const RegisterForm = () => (
 									name="occupation"
 									value={values.occupation}
 									onChange={handleChange}
+									className={errors.occupation && touched.occupation && 'error'}
 									onBlur={handleBlur}
 									placeholder="Enter your current occupation, if any"
 								/>
+								{errors.occupation &&
+								touched.occupation && <div className="input_feedback">{errors.occupation}</div>}
 							</div>
 							<br />
 							<br />
@@ -224,13 +217,7 @@ const RegisterForm = () => (
 								<button
 									type="submit"
 									className="formButton"
-									disabled={
-										errors.username ||
-										errors.email ||
-										errors.password ||
-										errors.password2 ||
-										isSubmitting
-									}
+									disabled={errors.username || errors.password || errors.password2 || isSubmitting}
 								>
 									CREATE ACCOUNT
 								</button>

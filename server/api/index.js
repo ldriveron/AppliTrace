@@ -13,10 +13,6 @@ import Contact from '../models/Contact';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-// For email confirmation
-import random_string from 'crypto-random-string';
-import ConfirmEmail from './ConfirmEmailHelper';
-
 // Return the current user's information
 router.get('/userdata', async (req, res) => {
 	if (req.isAuthenticated()) {
@@ -28,7 +24,6 @@ router.get('/userdata', async (req, res) => {
 			res.send({
 				user: {
 					username: user.username,
-					email: user.email,
 					joindate: user.joindate,
 					occupation: user.occupation,
 					industry: user.industry,
@@ -38,8 +33,6 @@ router.get('/userdata', async (req, res) => {
 					job_applications_total: user.job_applications_total,
 					region: user.region,
 					country: user.country,
-					allow_email_notifier: user.allow_email_notifier,
-					email_confirmed: user.email_confirmed,
 					private: user.private
 				}
 			});
@@ -408,102 +401,6 @@ router.post('/userdata/editprofile', async (req, res) => {
 	}
 });
 
-// Edit uer's email address
-router.post('/userdata/editemail', (req, res) => {
-	if (req.isAuthenticated()) {
-		// Get the new email entered by user
-		let newEmail = req.body.newEmail;
-
-		// If there is currently no user with the new email, then continue with updating
-		User.findOne({ email: newEmail }).then(async (user) => {
-			if (user) {
-				req.flash('user_alert', 'Email entered is already registered');
-				res.redirect('users/dashboard');
-			} else {
-				await User.findOne({ _id: req.user.id }).then(async (user) => {
-					// This is the code that will be sent in the url to the user
-					let confirmation_code = random_string({ length: 10, type: 'url-safe' });
-
-					// This is for the encrypted version of the confirmation code
-					let confirmation_code_secret;
-
-					// Generate a hash for the confirmation code
-					await bcrypt.genSalt(10, (err, salt) => {
-						bcrypt.hash(confirmation_code, salt, async (err, hash) => {
-							if (err) throw err;
-
-							confirmation_code_secret = hash;
-
-							// Send email to user's new email containing confirmation url
-							// Only update the user data if the email was actually sent
-							if (ConfirmEmail.sendEmail(newEmail, confirmation_code, req.user.id) != 1) {
-								// Set the user's email_confirmed field to false
-								// Update confirmation code for user in database using hash version
-								await user.updateOne({
-									email: newEmail,
-									email_confirmed: false,
-									confirmation_code: confirmation_code_secret
-								});
-
-								// Alert the user of the change
-								req.flash('user_alert', 'Check your new email for a confirmation link');
-								res.redirect('/users/dashboard');
-							} else {
-								// Alert the user that the email change was not successful
-								req.flash('user_alert', 'An error occurred. Try again or enter a different email.');
-								res.redirect('/users/dashboard');
-							}
-						});
-					});
-				});
-			}
-		});
-	} else {
-		res.redirect('/users/login');
-	}
-});
-
-// Resend email confirmation to user if requested
-router.post('/userdata/confirmemail', (req, res) => {
-	if (req.isAuthenticated()) {
-		User.findOne({ _id: req.user.id }).then(async (user) => {
-			// Only send an email confirmation if the user's email is not already confirmed
-			if (user.email_confirmed != true) {
-				let confirmation_code = random_string({ length: 10, type: 'url-safe' });
-
-				// This is for the encrypted version of the confirmation code
-				let confirmation_code_secret;
-
-				// Generate a hash for the confirmation code
-				await bcrypt.genSalt(10, (err, salt) =>
-					bcrypt.hash(confirmation_code, salt, async (err, hash) => {
-						if (err) throw err;
-
-						confirmation_code_secret = hash;
-
-						// Send email to user containing confirmation email
-						if (ConfirmEmail.sendEmail(req.user.email, confirmation_code, req.user.id) != 1) {
-							// Update confirmation code for user in database using hash version
-							await user.updateOne({ confirmation_code: confirmation_code_secret });
-
-							req.flash('user_alert', 'Check your email for a new confirmation link');
-							res.redirect('/users/dashboard');
-						} else {
-							req.flash('user_alert', 'An error occurred. Try again.');
-							res.redirect('/users/dashboard');
-						}
-					})
-				);
-			} else {
-				req.flash('user_alert', 'Your email is already confirmed');
-				res.redirect('/users/dashboard');
-			}
-		});
-	} else {
-		res.redirect('/users/login');
-	}
-});
-
 // Edit user's privacy setting
 router.post('/userdata/editprivacy', (req, res) => {
 	if (req.isAuthenticated()) {
@@ -584,8 +481,14 @@ router.post('/userdata/deleteaccount', async (req, res) => {
 					// Delete all job applications by the user from MongoDB
 					await Job.deleteMany({ user_id: req.user.id });
 
+					// Delete all user notes
+					await Note.deleteMany({ user_id: req.user.id });
+
+					// Delete all user contacts
+					await Contact.deleteMany({ user_id: req.user.id });
+
 					// End passport session and redirect user to login page
-					req.flash('success_msg', 'Your account and jobs applications have been deleted');
+					req.flash('success_msg', 'Your account and all related data has been deleted');
 					req.logout();
 
 					res.redirect('/users/login');

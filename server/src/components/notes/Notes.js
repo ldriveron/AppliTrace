@@ -45,38 +45,41 @@ class Notes extends Component {
 		let notes_to_add = [];
 
 		// Loop through all notes and add to side scroll bar
-		for (let app = 0; app < this.props.apps_list.results.length; app++) {
-			if (
-				term != null
-					? new RegExp(term, 'i').test(this.props.apps_list.results[app].notes)
-					: this.props.apps_list.results[app].notes != '' && this.props.apps_list.results[app].notes != null
-			) {
-				notes_to_add.unshift(
-					<div
-						className="single_note"
-						onClick={() =>
-							this.setSelectedNote({
-								company_name: this.props.apps_list.results[app].company_name,
-								title: this.props.apps_list.results[app].title,
-								note: this.props.apps_list.results[app].notes,
-								date: this.props.apps_list.results[app].date_applied,
-								from: 'apps'
-							})}
-						key={
-							this.props.apps_list.results[app].company_name +
-							this.props.apps_list.results[app].date_applied
-						}
-					>
-						<div className="note_title">{this.props.apps_list.results[app].company_name}</div>
-						<div className="notes_short_text">
-							{this.props.apps_list.results[app].notes.length > 30 ? (
-								this.props.apps_list.results[app].notes.substring(0, 30) + '...'
-							) : (
-								this.props.apps_list.results[app].notes
-							)}
+		if (this.props.apps_list.total_results != 0) {
+			for (let app = 0; app < this.props.apps_list.results.length; app++) {
+				if (
+					term != null
+						? new RegExp(term, 'i').test(this.props.apps_list.results[app].notes)
+						: this.props.apps_list.results[app].notes != '' &&
+							this.props.apps_list.results[app].notes != null
+				) {
+					notes_to_add.unshift(
+						<div
+							className="single_note"
+							onClick={() =>
+								this.setSelectedNote({
+									company_name: this.props.apps_list.results[app].company_name,
+									title: this.props.apps_list.results[app].title,
+									note: this.props.apps_list.results[app].notes,
+									date: this.props.apps_list.results[app].date_applied,
+									from: 'apps'
+								})}
+							key={
+								this.props.apps_list.results[app].company_name +
+								this.props.apps_list.results[app].date_applied
+							}
+						>
+							<div className="note_title">{this.props.apps_list.results[app].company_name}</div>
+							<div className="notes_short_text">
+								{this.props.apps_list.results[app].notes.length > 30 ? (
+									this.props.apps_list.results[app].notes.substring(0, 30) + '...'
+								) : (
+									this.props.apps_list.results[app].notes
+								)}
+							</div>
 						</div>
-					</div>
-				);
+					);
+				}
 			}
 		}
 
@@ -156,6 +159,9 @@ class Notes extends Component {
 								+ New Note
 							</div>
 
+							{this.state.notes.length == 0 && (
+								<span style={{ marginLeft: '80px' }}>No notes to show</span>
+							)}
 							{this.state.notes}
 						</div>
 

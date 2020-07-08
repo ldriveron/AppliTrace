@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import NewJobFormManual from './NewJobFormManual';
 import NewJobFormExternal from './NewJobFormExternal';
 
-const AddNewJob = () => {
+import PropTypes from 'prop-types';
+
+const AddNewJob = (props) => {
 	// Use this state to keep track of the job type the user selects
 	let [ jobType, setJobType ] = useState(null);
 
@@ -12,11 +14,18 @@ const AddNewJob = () => {
 	// Close the form if one is currently open
 	// Also hide applications list div when adding a new application
 	function setClose() {
-		if (jobType != null) {
-			setJobType(null);
-			document.getElementById('apps').style.display = 'initial';
+		if (props.total_results != 0) {
+			if (jobType != null) {
+				setJobType(null);
+				document.getElementById('apps').style.display = 'initial';
+			} else {
+				document.getElementById('apps').style.display = 'none';
+			}
 		} else {
-			document.getElementById('apps').style.display = 'none';
+			if (jobType != null) {
+				setJobType(null);
+			} else {
+			}
 		}
 	}
 
@@ -118,6 +127,8 @@ const AddNewJob = () => {
 	return content;
 };
 
-AddNewJob.propTypes = {};
+AddNewJob.propTypes = {
+	total_results: PropTypes.number
+};
 
 export default AddNewJob;

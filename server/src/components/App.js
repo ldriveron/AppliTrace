@@ -76,7 +76,6 @@ class App extends Component {
 							user_data: {
 								user_id: this.state.user_id,
 								username: resp.user.username,
-								email: resp.user.email,
 								joindate: resp.user.joindate,
 								occupation: resp.user.occupation,
 								industry: resp.user.industry,
@@ -86,8 +85,6 @@ class App extends Component {
 								job_applications_total: resp.user.job_applications_total,
 								region: resp.user.region,
 								country: resp.user.country,
-								allow_email_notifier: resp.user.allow_email_notifier,
-								email_confirmed: resp.user.email_confirmed,
 								private: resp.user.private
 							}
 						});

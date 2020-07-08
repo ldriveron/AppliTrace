@@ -21,15 +21,15 @@ const LoginForm = (props) => {
 			<div className="form_box">
 				<form action="/users/login" method="POST">
 					<h1>Welcome</h1>
-					<div className="email">
-						<label htmlFor="email">Email</label>
+					<div className="username">
+						<label htmlFor="username">Username</label>
 						<br />
 						<input
 							type="text"
-							id="email"
-							name="email"
-							placeholder="Enter your Email"
-							defaultValue={props.email}
+							id="username"
+							name="username"
+							placeholder="Enter your username"
+							defaultValue={props.username}
 							required
 						/>
 					</div>
