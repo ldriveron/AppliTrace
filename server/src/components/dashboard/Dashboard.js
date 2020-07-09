@@ -12,109 +12,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 class Dashboard extends Component {
 	state = {
 		user_data: this.props.user_data,
-		total_this_week: 0,
-		last_week_total: 0,
-		total_this_month: 0,
-		total_last_month: 0,
-		difference_between_weeks: 0,
-		difference_between_months: 0
+		user_stats: this.props.user_stats
 	};
 
-	componentDidMount() {
-		let today = new Date();
-		let this_month = today.getMonth() == 11 ? 1 : today.getMonth() + 1;
-
-		this.calculateWeekanMonthStats(today, this_month);
-
+	async componentDidMount() {
 		document.title = 'Dashboard';
-	}
-
-	calculateWeekanMonthStats(today, this_month) {
-		// Get the previous occuring Sunday
-		let this_week_start = new Date(today.setDate(today.getDate() - today.getDay()));
-
-		// Get the sunday from last week
-		let last_week_start = new Date();
-		last_week_start.setDate(this_week_start.getDate() - 7);
-
-		// Calculate the last day of the current week (sunday to sunday)
-		let this_week_end = new Date();
-		this_week_end.setDate(this_week_start.getDate() + 6);
-
-		// Last week's sunday
-		let second_week_end = new Date(last_week_start.getTime());
-		second_week_end.setDate(second_week_end.getDate() + 6);
-
-		// Week totals
-		let this_week_total = 0;
-		let last_week_total = 0;
-
-		// Month totals
-		let this_month_total = 0;
-		let last_month_total = 0;
-
-		// Loop through all applications
-		if (this.props.apps_list.total_results != 0) {
-			for (let app = 0; app < this.props.apps_list.results.length; app++) {
-				var application_date = new Date(this.props.apps_list.results[app].date_applied);
-
-				// Count how many applications sent during the current week
-				// Exact dates for some reason are not considered qual when using just the Date object
-				// Using .toLocalDateString() for those cases
-				if (
-					(application_date >= this_week_start ||
-						application_date.toLocaleDateString() == this_week_start.toLocaleDateString()) &&
-					(application_date <= this_week_end ||
-						application_date.toLocaleDateString() == this_week_end.toLocaleDateString())
-				) {
-					this_week_total++;
-				}
-
-				// Check how many applications the user has for the previous week
-				if (
-					(application_date >= last_week_start ||
-						application_date.toLocaleDateString() == last_week_start.toLocaleDateString()) &&
-					(application_date <= second_week_end ||
-						application_date.toLocaleDateString() == second_week_end.toLocaleDateString())
-				) {
-					last_week_total++;
-				}
-
-				// Count how many applications sent during the current month
-				if ((application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) == this_month) {
-					this_month_total++;
-				}
-
-				// Count how many applications sent during the previous month
-				if (
-					(application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) ==
-					(this_month == 1 ? 12 : this_month - 1)
-				) {
-					last_month_total++;
-				}
-			}
-		}
-
-		// Calculate the percentage difference between last week and this week
-		let difference_between_weeks = 0;
-
-		difference_between_weeks = (100 *
-			Math.abs((last_week_total - this_week_total) / (last_week_total + this_week_total / 2))).toFixed(2);
-
-		// Calculate the percentage difference between last month and this month
-		let difference_between_months = 0;
-
-		difference_between_months = (100 *
-			Math.abs((last_month_total - this_month_total) / (last_month_total + this_month_total / 2))).toFixed(2);
-
-		this.setState({
-			last_week_total: last_week_total,
-			total_this_week: this_week_total,
-			total_last_month: last_month_total,
-			total_this_month: this_month_total,
-			difference_between_weeks: difference_between_weeks,
-			difference_between_months: difference_between_months
-		});
 	}
 
 	render() {
@@ -122,20 +24,23 @@ class Dashboard extends Component {
 		let week_percent_class;
 		let week_percent_icon;
 		let week_plus_or_minus;
-		if (this.state.last_week_total > this.state.total_this_week && this.state.difference_between_weeks != 0) {
+		if (
+			this.state.user_stats.last_week_total > this.state.user_stats.total_this_week &&
+			this.state.user_stats.difference_between_weeks != 0
+		) {
 			week_percent_class = 'percent_change percent_drop';
 			week_percent_icon = 'chevron-circle-down';
 			week_plus_or_minus = '-';
 		} else if (
-			this.state.last_week_total < this.state.total_this_week &&
-			this.state.difference_between_weeks != 0
+			this.state.user_stats.last_week_total < this.state.user_stats.total_this_week &&
+			this.state.user_stats.difference_between_weeks != 0
 		) {
 			week_percent_class = 'percent_change percent_gain';
 			week_percent_icon = 'chevron-circle-up';
 			week_plus_or_minus = '+';
 		} else if (
-			this.state.last_week_total == this.state.total_this_week ||
-			this.state.difference_between_weeks == 0
+			this.state.user_stats.last_week_total == this.state.user_stats.total_this_week ||
+			this.state.user_stats.difference_between_weeks == 0
 		) {
 			week_percent_class = 'percent_change';
 			week_percent_icon = 'chevron-circle-right';
@@ -146,20 +51,23 @@ class Dashboard extends Component {
 		let month_percent_class;
 		let month_percent_icon;
 		let month_plus_or_minus;
-		if (this.state.total_last_month > this.state.total_this_month && this.state.difference_between_months != 0) {
+		if (
+			this.state.user_stats.total_last_month > this.state.user_stats.total_this_month &&
+			this.state.user_stats.difference_between_months != 0
+		) {
 			month_percent_class = 'percent_change percent_drop';
 			month_percent_icon = 'chevron-circle-down';
 			month_plus_or_minus = '-';
 		} else if (
-			this.state.total_last_month < this.state.total_this_month &&
+			this.state.user_stats.total_last_month < this.state.user_stats.total_this_month &&
 			this.state.difference_between_months != 0
 		) {
 			month_percent_class = 'percent_change percent_gain';
 			month_percent_icon = 'chevron-circle-up';
 			month_plus_or_minus = '+';
 		} else if (
-			this.state.total_last_month == this.state.total_this_month ||
-			this.state.difference_between_months == 0
+			this.state.user_stats.total_last_month == this.state.user_stats.total_this_month ||
+			this.state.user_stats.difference_between_months == 0
 		) {
 			month_percent_class = 'percent_change';
 			month_percent_icon = 'chevron-circle-right';
@@ -188,6 +96,7 @@ class Dashboard extends Component {
 									type="text"
 									name="search_term"
 									id="search_term"
+									defaultValue={this.props.search_term}
 									placeholder="Search applications..."
 									onChange={(term) => this.props.handleSearch(term.target.value)}
 								/>
@@ -247,30 +156,30 @@ class Dashboard extends Component {
 								<div className="user_stat">
 									<div className="tooltip bottom">
 										<div className="type">Total This Week</div>
-										<div className="count">{this.state.total_this_week}</div>
+										<div className="count">{this.state.user_stats.total_this_week}</div>
 										<div className={week_percent_class}>
 											<span style={{ marginRight: '5px' }}>
 												<FontAwesomeIcon icon={week_percent_icon} />
 											</span>
-											{week_plus_or_minus + this.state.difference_between_weeks}%
+											{week_plus_or_minus + this.state.user_stats.difference_between_weeks}%
 										</div>
 										<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
-											Compared to {this.state.last_week_total} last week
+											Compared to {this.state.user_stats.last_week_total} last week
 										</span>
 									</div>
 								</div>
 								<div className="user_stat">
 									<div className="tooltip bottom">
 										<div className="type">Total This Month</div>
-										<div className="count">{this.state.total_this_month}</div>
+										<div className="count">{this.state.user_stats.total_this_month}</div>
 										<div className={month_percent_class}>
 											<span style={{ marginRight: '5px' }}>
 												<FontAwesomeIcon icon={month_percent_icon} />
 											</span>
-											{month_plus_or_minus + this.state.difference_between_months}%
+											{month_plus_or_minus + this.state.user_stats.difference_between_months}%
 										</div>
 										<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
-											Compared to {this.state.total_last_month} last month
+											Compared to {this.state.user_stats.total_last_month} last month
 										</span>
 									</div>
 								</div>
@@ -298,6 +207,7 @@ class Dashboard extends Component {
 Dashboard.propTypes = {
 	user_id: PropTypes.string,
 	user_data: PropTypes.object,
+	user_stats: PropTypes.object,
 	apps_list: PropTypes.object,
 	search_term: PropTypes.string,
 	search_type: PropTypes.string,

@@ -11,14 +11,10 @@ offline.html
 robots.txt
 service-worker.js
 /sass
-server/api/NotifierService.js
-server/api/ConfirmEmailHelper.js
 server/models
 server/routes/index.js
-server/src/components/dashboard/addnewjob/newJobFormExternal.js
 server/src/components/settings/DeleteAccount.js
 server/src/api.js
-server/src/components/StartingPage.js
 server/passport-config.js
 server/config.js
 views/index.ejs

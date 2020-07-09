@@ -100,26 +100,13 @@ const AddNewJob = (props) => {
 					<div className="job_circle ziprecruiter">+</div>
 					<div className="job_text">ZipRecruiter</div>
 				</div>
-
-				<div
-					className="job_type"
-					onClick={() => {
-						setJobType('Snagajob'),
-							setUrlRegex(
-								new RegExp(
-									/https:\/\/(www\.)?snagajob\.com([-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))?/gi
-								)
-							),
-							setClose();
-					}}
-				>
-					<div className="job_circle snagajob">+</div>
-					<div className="job_text">snagajob</div>
-				</div>
 			</div>
 			<div style={{ width: '100%' }}>
 				{jobType == 'manual' && <NewJobFormManual initialDate={initialDate} />}
-				{jobType != 'manual' && jobType != null && <NewJobFormExternal source={jobType} urlregex={urlregex} />}
+				{jobType != 'manual' &&
+				jobType != null && (
+					<NewJobFormExternal source={jobType} urlregex={urlregex} initialDate={initialDate} />
+				)}
 			</div>
 		</div>
 	);

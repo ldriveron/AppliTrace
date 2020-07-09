@@ -60,8 +60,8 @@ class App extends Component {
 		search_order: '-date_added'
 	};
 
-	componentDidMount() {
-		api.authUser().then(async (resp) => {
+	async componentDidMount() {
+		await api.authUser().then(async (resp) => {
 			if (resp.id) {
 				this.setState({
 					user_id: resp.id,
@@ -94,13 +94,110 @@ class App extends Component {
 				// Fetch all of the users applications and set the state
 				await api.fetchAllJobs(this.state.search_order).then((resp) => {
 					this.setState({
-						apps_list: resp
+						apps_list: resp,
+						apps_list_full: resp
 					});
 				});
 			} else {
 				this.setState({
 					isLoggedIn: false
 				});
+			}
+		});
+
+		let today = new Date();
+		let this_month = today.getMonth() == 11 ? 1 : today.getMonth() + 1;
+
+		// Doing this here so that the user stats will only be calculated once
+		await this.calculateWeekanMonthStats(today, this_month);
+	}
+
+	calculateWeekanMonthStats(today, this_month) {
+		// Get the previous occuring Sunday
+		let this_week_start = new Date(today.setDate(today.getDate() - today.getDay()));
+
+		// Get the sunday from last week
+		let last_week_start = new Date();
+		last_week_start.setDate(this_week_start.getDate() - 7);
+
+		// Calculate the last day of the current week (sunday to sunday)
+		let this_week_end = new Date();
+		this_week_end.setDate(this_week_start.getDate() + 6);
+
+		// Last week's sunday
+		let second_week_end = new Date(last_week_start.getTime());
+		second_week_end.setDate(second_week_end.getDate() + 6);
+
+		// Week totals
+		let this_week_total = 0;
+		let last_week_total = 0;
+
+		// Month totals
+		let this_month_total = 0;
+		let last_month_total = 0;
+
+		// Loop through all applications
+		if (this.state.apps_list.total_results != 0) {
+			for (let app = 0; app < this.state.apps_list.results.length; app++) {
+				var application_date = new Date(this.state.apps_list.results[app].date_applied);
+
+				// Count how many applications sent during the current week
+				// Exact dates for some reason are not considered qual when using just the Date object
+				// Using .toLocalDateString() for those cases
+				if (
+					(application_date >= this_week_start ||
+						application_date.toLocaleDateString() == this_week_start.toLocaleDateString()) &&
+					(application_date <= this_week_end ||
+						application_date.toLocaleDateString() == this_week_end.toLocaleDateString())
+				) {
+					this_week_total++;
+				}
+
+				// Check how many applications the user has for the previous week
+				if (
+					(application_date >= last_week_start ||
+						application_date.toLocaleDateString() == last_week_start.toLocaleDateString()) &&
+					(application_date <= second_week_end ||
+						application_date.toLocaleDateString() == second_week_end.toLocaleDateString())
+				) {
+					last_week_total++;
+				}
+
+				// Count how many applications sent during the current month
+				if ((application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) == this_month) {
+					this_month_total++;
+				}
+
+				// Count how many applications sent during the previous month
+				if (
+					(application_date.getMonth() == 11 ? 1 : application_date.getMonth() + 1) ==
+					(this_month == 1 ? 12 : this_month - 1)
+				) {
+					last_month_total++;
+				}
+			}
+		}
+
+		// Calculate the percentage difference between last week and this week
+		let difference_between_weeks = 0;
+
+		difference_between_weeks = (100 *
+			Math.abs((last_week_total - this_week_total) / (last_week_total + this_week_total / 2))).toFixed(2);
+
+		// Calculate the percentage difference between last month and this month
+		let difference_between_months = 0;
+
+		difference_between_months = (100 *
+			Math.abs((last_month_total - this_month_total) / (last_month_total + this_month_total / 2))).toFixed(2);
+
+		this.setState({
+			user_stats: {
+				last_week_total: last_week_total,
+				total_this_week: this_week_total,
+				total_last_month: last_month_total,
+				total_this_month: this_month_total,
+				difference_between_weeks: difference_between_weeks,
+				difference_between_months: difference_between_months
 			}
 		});
 	}
@@ -166,7 +263,8 @@ class App extends Component {
 					<Header isLoggedIn={this.state.isLoggedIn} user_data={this.state.user_data} />
 				)}
 
-				{this.state.user_data.user_id && this.state.apps_list ? (
+				{/* Wait for the applications list and user stats to finish loading */}
+				{this.state.user_data.user_id && this.state.apps_list && this.state.user_stats ? (
 					<Switch>
 						{/* Dashboard route */}
 						<Route
@@ -176,6 +274,7 @@ class App extends Component {
 								<Dashboard
 									{...props}
 									user_data={this.state.user_data}
+									user_stats={this.state.user_stats}
 									apps_list={this.state.apps_list}
 									search_term={this.state.search_term}
 									search_type={this.state.search_type}
@@ -192,7 +291,11 @@ class App extends Component {
 							path="/users/notes"
 							exact
 							render={(props) => (
-								<Notes {...props} user_data={this.state.user_data} apps_list={this.state.apps_list} />
+								<Notes
+									{...props}
+									user_data={this.state.user_data}
+									apps_list={this.state.apps_list_full}
+								/>
 							)}
 						/>
 
@@ -201,17 +304,7 @@ class App extends Component {
 							path="/users/contacts"
 							exact
 							render={(props) => (
-								<Contacts
-									{...props}
-									user_data={this.state.user_data}
-									apps_list={this.state.apps_list}
-									search_term={this.state.search_term}
-									search_type={this.state.search_type}
-									search_order={this.state.search_order}
-									handleSearch={this.handleSearch.bind(this)}
-									handleSearchOrderChange={this.handleSearchOrderChange.bind(this)}
-									handleSearchTypeChange={this.handleSearchTypeChange.bind(this)}
-								/>
+								<Contacts {...props} user_id={this.state.user_id} user_data={this.state.user_data} />
 							)}
 						/>
 

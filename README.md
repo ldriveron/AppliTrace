@@ -1,7 +1,7 @@
 # AppliTrace
 ### By Luis Riveron
 
-# Live At (DeployeD)
+# Live At (Deployed)
 [https://applitrace.herokuapp.com](https://applitrace.herokuapp.com)
 
 AppliTrace is a web application for tracking the status of work applications during the job search.
@@ -9,9 +9,7 @@ AppliTrace is a web application for tracking the status of work applications dur
 After creating an account, users can keep track of their job applications from various sources such as:
 - Manually entering an application
 - Indeed
-- LinkedIn
 - ZipRecruiter
-- Snagajob
 
 Each job application keeps track of:
 - Date the user applied to the position

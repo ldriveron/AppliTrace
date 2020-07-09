@@ -42,7 +42,7 @@ server.get('/register', checkAuthenticated, (req, res) => {
 
 server.post('/register/:region/:location', checkAuthenticated, async (req, res) => {
 	// Create a user account using the form information
-	let { username, password, email, industry, occupation, region, country } = req.body;
+	let { username, password, industry, occupation, region, country } = req.body;
 
 	// If occupation is left empty, set it to "Job Seeker"
 	if (occupation == '') occupation = 'Job Seeker';
@@ -60,7 +60,8 @@ server.post('/register/:region/:location', checkAuthenticated, async (req, res) 
 		});
 	} else {
 		// Passed form validation
-		await User.findOne({ username: username }).then(async (user) => {
+		let usernamereq = new RegExp(username, 'i');
+		await User.findOne({ username: usernamereq }).then(async (user) => {
 			if (user) {
 				// User exists, show as an error
 				req.flash('user_error', 'Username entered is already registered');

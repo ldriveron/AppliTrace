@@ -13,6 +13,10 @@ import Contact from '../models/Contact';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+// For external job applications
+import axios from 'axios';
+import cheerio from 'cheerio';
+
 // Return the current user's information
 router.get('/userdata', async (req, res) => {
 	if (req.isAuthenticated()) {
@@ -169,6 +173,206 @@ router.post('/userdata/newjob/:source', async (req, res) => {
 	}
 });
 
+// Add a new job from an external url
+router.post('/userdata/newjobexternal/:source', async (req, res) => {
+	let { source_url, date_applied, status, recruiter_name, phone_number, email_address, salary, notes } = req.body;
+
+	let source = req.params.source;
+
+	let user_id = req.user.id;
+
+	const url = source_url;
+	const html = await axios.get(url);
+
+	let newJob = {};
+
+	switch (source) {
+		case 'Indeed':
+			newJob = await jobFromIndeed(
+				user_id,
+				source,
+				source_url,
+				date_applied,
+				status,
+				recruiter_name,
+				phone_number,
+				email_address,
+				salary,
+				notes,
+				html
+			);
+			break;
+		case 'ZipRecruiter':
+			newJob = await jobFromZipRecruiter(
+				user_id,
+				source,
+				source_url,
+				date_applied,
+				status,
+				recruiter_name,
+				phone_number,
+				email_address,
+				salary,
+				notes,
+				html
+			);
+	}
+
+	// Add job application information to database
+	await newJob
+		.save(
+			// Update the user's total applications count
+			// Only do this if the job application has been saved
+			await User.findOne({ _id: req.user.id }).then(async (user) => {
+				await user.updateOne({ job_applications_total: user.job_applications_total + 1 });
+			})
+		)
+		.catch(console.error);
+
+	req.flash('user_alert', 'Job application from ' + source + ' has been added');
+	res.redirect('/users/dashboard');
+});
+
+// Retrieve job application data from Indeed based on provided URL
+let jobFromIndeed = async (
+	user_id,
+	source,
+	source_url,
+	date_applied,
+	status,
+	recruiter_name,
+	phone_number,
+	email_address,
+	salary,
+	notes,
+	html
+) => {
+	const $ = await cheerio.load(html.data);
+
+	let title = $('.jobsearch-JobInfoHeader-title').text();
+	let company_name =
+		$('.icl-u-lg-mr--sm a').text() == '' ? $('.icl-u-lg-mr--sm').text() : $('.icl-u-lg-mr--sm a').text();
+	let company_website = '';
+	let find_website = $('.jobsearch-JobComponent-description .jobsearch-jobDescriptionText p').each((i, item) => {
+		if ($(item).text().localeCompare("Company's website:") == 0) {
+			company_website = 'https://' + $(item).next().text();
+		}
+	});
+	let location = $('.jobsearch-DesktopStickyContainer .icl-u-lg-mr--sm').next().text();
+	location = location.substring(location.indexOf('-') + 1, location.length);
+	let benefits = '';
+	let find_benefits = $('.jobsearch-JobComponent-description .jobsearch-jobDescriptionText p').each((i, item) => {
+		if ($(item).text().localeCompare('Benefits:') == 0) {
+			benefits = $(item).next().text();
+		}
+	});
+	let description = '';
+	let find_description = $('.jobsearch-jobDescriptionText p b').each((i, item) => {
+		if ($(item).text().localeCompare('Job Description') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Summary:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Experience:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Plusses:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Essential Functions:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Job Summary ') == 0) {
+			description = $(item).parent().next().text();
+		}
+	});
+
+	return new Job({
+		user_id,
+		source,
+		source_url,
+		date_applied,
+		company_name,
+		company_website,
+		title,
+		location,
+		phone_number,
+		email_address,
+		recruiter_name,
+		notes,
+		status,
+		salary,
+		benefits,
+		description
+	});
+};
+
+// Retrieve job application data from ZipRecruiter based on provided URL
+let jobFromZipRecruiter = async (
+	user_id,
+	source,
+	source_url,
+	date_applied,
+	status,
+	recruiter_name,
+	phone_number,
+	email_address,
+	salary,
+	notes,
+	html
+) => {
+	const $ = await cheerio.load(html.data);
+
+	let title = $('.job_title').text().trim() ? $('.job_title').text().trim() : '';
+	let company_name = $('.hiring_company_text a').text() ? $('.hiring_company_text a').text() : '';
+	let company_website = '';
+	let find_website = $('.job_more_section .job_more .text').each((i, item) => {
+		if ($(item).text().localeCompare('Company website:') == 0) {
+			company_website = $(item).next().attr('href');
+		}
+	});
+	let location = $('.inner_wrapper .location_text span').text() ? $('.inner_wrapper .location_text span').text() : '';
+	let benefits = '';
+	let find_benefits = $('.jobDescriptionSection div p strong').each((i, item) => {
+		if ($(item).text().localeCompare('Perks & Compensation:') == 0) {
+			benefits = $(item).parent().next().text();
+		}
+	});
+	let description = '';
+	let find_description = $('.jobDescriptionSection div p strong').each((i, item) => {
+		if ($(item).text().localeCompare('The Role:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Responsibilities:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Job Responsibilities:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Primary Responsibilities') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Key Responsibilities:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('The Position:') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Minimum Requirements:') == 0) {
+			description = $(item).parent().next().text();
+		}
+	});
+
+	return new Job({
+		user_id,
+		source,
+		source_url,
+		date_applied,
+		company_name,
+		company_website,
+		title,
+		location,
+		phone_number,
+		email_address,
+		recruiter_name,
+		notes,
+		status,
+		salary,
+		benefits,
+		description
+	});
+};
+
 // Edit a job application for the user on MongoDB
 router.post('/userdata/editjob/:id', async (req, res) => {
 	if (req.isAuthenticated()) {
@@ -176,6 +380,7 @@ router.post('/userdata/editjob/:id', async (req, res) => {
 		// Get the application data from the form
 		let {
 			source_url,
+			source,
 			date_applied,
 			company_name,
 			company_website,
@@ -196,6 +401,7 @@ router.post('/userdata/editjob/:id', async (req, res) => {
 			if (app.user_id == req.user.id) {
 				await app.updateOne({
 					source_url: source_url,
+					source: source,
 					date_applied: date_applied,
 					company_name: company_name,
 					company_website: company_website,

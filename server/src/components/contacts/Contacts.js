@@ -136,8 +136,7 @@ class Contacts extends Component {
 
 Contacts.propTypes = {
 	user_id: PropTypes.string,
-	user_data: PropTypes.object,
-	apps_list: PropTypes.object
+	user_data: PropTypes.object
 };
 
 export default Contacts;
