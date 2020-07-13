@@ -34,7 +34,7 @@ const NewJobFormExternal = (props) => (
 			source_url: Yup.string()
 				.required('Link is required')
 				.min(5, 'Link must be 5 characters or longer')
-				.max(200, 'Link must be 200 characters or less')
+				.max(300, 'Link must be 300 characters or less')
 				.matches(
 					props.urlregex,
 					'A link in the proper format is required [https://(www.)' + props.source.toLowerCase() + '.com]'

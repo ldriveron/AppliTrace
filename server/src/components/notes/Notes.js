@@ -134,7 +134,7 @@ class Notes extends Component {
 		return (
 			<div className="dashboard">
 				<WeekView />
-				<div className="in_content" style={{ height: '100%' }}>
+				<div className="in_content">
 					<div className="notes_component">
 						<div className="notes_scroller">
 							{/* Search input for notes */}

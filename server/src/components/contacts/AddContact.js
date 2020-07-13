@@ -19,15 +19,16 @@ const AddContact = (props) => (
 		}}
 		validationSchema={Yup.object().shape({
 			name: Yup.string()
-				.min(3, 'Recruiter name must be 3 characters or longer')
-				.max(25, 'Recruiter name must be 25 characters or less'),
+				.required('Contact name is required')
+				.min(3, 'Contact name must be 3 characters or longer')
+				.max(50, 'Contact name must be 50 characters or less'),
 			associated_company: Yup.string()
 				.required('Company name is required')
 				.min(2, 'Company name must be 2 characters or longer')
-				.max(60, 'Company name must be 60 characters or less'),
+				.max(70, 'Company name must be 70 characters or less'),
 			location: Yup.string()
 				.min(3, 'Location must be 3 characters or longer')
-				.max(50, 'Location must be 50 characters or less'),
+				.max(70, 'Location must be 70 characters or less'),
 			phone_number: Yup.string().matches(
 				/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
 				'Enter a valid phone number'
@@ -63,6 +64,7 @@ const AddContact = (props) => (
 								onBlur={handleBlur}
 								className={errors.name && touched.name && 'error'}
 								placeholder="Enter a name"
+								required
 							/>
 							{errors.name && touched.name && <div className="input_feedback">{errors.name}</div>}
 						</div>
@@ -79,6 +81,7 @@ const AddContact = (props) => (
 								onBlur={handleBlur}
 								className={errors.associated_company && touched.associated_company && 'error'}
 								placeholder="Enter a company name"
+								required
 							/>
 							{errors.associated_company &&
 							touched.associated_company && (

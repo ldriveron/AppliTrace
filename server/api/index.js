@@ -22,7 +22,7 @@ router.get('/userdata', async (req, res) => {
 	if (req.isAuthenticated()) {
 		await User.findOne({ _id: req.user.id }).then(async (user) => {
 			await user.updateOne({
-				last_activity: new Date().toLocaleDateString('en-US', { timeZone: user.timeZone })
+				last_activity: new Date().toLocaleDateString('en-US', { timeZone: user.timezone })
 			});
 
 			res.send({
@@ -135,6 +135,8 @@ router.post('/userdata/newjob/:source', async (req, res) => {
 			description
 		} = req.body;
 
+		let date_added = new Date().toLocaleDateString('en-US', { timeZone: req.user.timezone });
+
 		let source = req.params.source;
 
 		let user_id = req.user.id;
@@ -144,6 +146,7 @@ router.post('/userdata/newjob/:source', async (req, res) => {
 			source,
 			source_url,
 			date_applied,
+			date_added,
 			company_name,
 			company_website,
 			title,
@@ -177,60 +180,87 @@ router.post('/userdata/newjob/:source', async (req, res) => {
 router.post('/userdata/newjobexternal/:source', async (req, res) => {
 	let { source_url, date_applied, status, recruiter_name, phone_number, email_address, salary, notes } = req.body;
 
+	let date_added = new Date().toLocaleDateString('en-US', { timeZone: req.user.timezone });
+
 	let source = req.params.source;
 
 	let user_id = req.user.id;
 
+	let error_found = false;
+
 	const url = source_url;
-	const html = await axios.get(url);
+	const html = await axios.get(url).catch((error) => {
+		if (error) {
+			error_found = true;
+			req.flash('user_error', 'An error occured with the link from ' + source);
+			res.redirect('/users/dashboard');
+		}
+	});
 
 	let newJob = {};
 
-	switch (source) {
-		case 'Indeed':
-			newJob = await jobFromIndeed(
-				user_id,
-				source,
-				source_url,
-				date_applied,
-				status,
-				recruiter_name,
-				phone_number,
-				email_address,
-				salary,
-				notes,
-				html
-			);
-			break;
-		case 'ZipRecruiter':
-			newJob = await jobFromZipRecruiter(
-				user_id,
-				source,
-				source_url,
-				date_applied,
-				status,
-				recruiter_name,
-				phone_number,
-				email_address,
-				salary,
-				notes,
-				html
-			);
+	// Only continue with creating the job application if no error happened when retreiving the data from the source
+	if (!error_found) {
+		switch (source) {
+			case 'Indeed':
+				newJob = await jobFromIndeed(
+					user_id,
+					source,
+					source_url,
+					date_applied,
+					date_added,
+					status,
+					recruiter_name,
+					phone_number,
+					email_address,
+					salary,
+					notes,
+					html
+				);
+				break;
+			case 'ZipRecruiter':
+				newJob = await jobFromZipRecruiter(
+					user_id,
+					source,
+					source_url,
+					date_applied,
+					date_added,
+					status,
+					recruiter_name,
+					phone_number,
+					email_address,
+					salary,
+					notes,
+					html
+				);
+				break;
+		}
+
+		// Only add the job application if both title and company name were found
+		if (newJob.title != '' && newJob.company_name != '') {
+			// Get rid of the '-' that Indeed adds to company name
+			if (source == 'Indeed') {
+				newJob.company_name = newJob.company_name.substr(0, newJob.company_name.length - 1);
+			}
+
+			// Add job application information to database
+			await newJob
+				.save(
+					// Update the user's total applications count
+					// Only do this if the job application has been saved
+					await User.findOne({ _id: req.user.id }).then(async (user) => {
+						await user.updateOne({ job_applications_total: user.job_applications_total + 1 });
+					})
+				)
+				.catch(console.error);
+
+			req.flash('user_alert', 'Job application from ' + source + ' has been added');
+			res.redirect('/users/dashboard');
+		} else {
+			req.flash('user_error', 'An error occured with the link from ' + source);
+			res.redirect('/users/dashboard');
+		}
 	}
-
-	// Add job application information to database
-	await newJob
-		.save(
-			// Update the user's total applications count
-			// Only do this if the job application has been saved
-			await User.findOne({ _id: req.user.id }).then(async (user) => {
-				await user.updateOne({ job_applications_total: user.job_applications_total + 1 });
-			})
-		)
-		.catch(console.error);
-
-	req.flash('user_alert', 'Job application from ' + source + ' has been added');
-	res.redirect('/users/dashboard');
 });
 
 // Retrieve job application data from Indeed based on provided URL
@@ -239,6 +269,7 @@ let jobFromIndeed = async (
 	source,
 	source_url,
 	date_applied,
+	date_added,
 	status,
 	recruiter_name,
 	phone_number,
@@ -255,7 +286,11 @@ let jobFromIndeed = async (
 	let company_website = '';
 	let find_website = $('.jobsearch-JobComponent-description .jobsearch-jobDescriptionText p').each((i, item) => {
 		if ($(item).text().localeCompare("Company's website:") == 0) {
-			company_website = 'https://' + $(item).next().text();
+			if ($(item).next().text().substr(0, 8).localeCompare('https://') != 0) {
+				company_website = 'https://' + $(item).next().text();
+			} else {
+				company_website = $(item).next().text();
+			}
 		}
 	});
 	let location = $('.jobsearch-DesktopStickyContainer .icl-u-lg-mr--sm').next().text();
@@ -280,6 +315,10 @@ let jobFromIndeed = async (
 			description = $(item).parent().next().text();
 		} else if ($(item).text().localeCompare('Job Summary ') == 0) {
 			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Responsibilities') == 0) {
+			description = $(item).parent().next().text();
+		} else if ($(item).text().localeCompare('Skills') == 0) {
+			description = $(item).parent().next().text();
 		}
 	});
 
@@ -288,6 +327,7 @@ let jobFromIndeed = async (
 		source,
 		source_url,
 		date_applied,
+		date_added,
 		company_name,
 		company_website,
 		title,
@@ -309,6 +349,7 @@ let jobFromZipRecruiter = async (
 	source,
 	source_url,
 	date_applied,
+	date_added,
 	status,
 	recruiter_name,
 	phone_number,
@@ -324,7 +365,15 @@ let jobFromZipRecruiter = async (
 	let company_website = '';
 	let find_website = $('.job_more_section .job_more .text').each((i, item) => {
 		if ($(item).text().localeCompare('Company website:') == 0) {
-			company_website = $(item).next().attr('href');
+			if ($(item).next().attr('href').substr(0, 7).localeCompare('http://') == 0) {
+				company_website =
+					'https://' + $(item).next().attr('href').substr(7, $(item).next().attr('href').length);
+			} else if ($(item).next().attr('href').substr(0, 8).localeCompare('https://') != 0) {
+				company_website =
+					'https://' + $(item).next().attr('href').substr(8, $(item).next().attr('href').length);
+			} else {
+				company_website = $(item).next().attr('href');
+			}
 		}
 	});
 	let location = $('.inner_wrapper .location_text span').text() ? $('.inner_wrapper .location_text span').text() : '';
@@ -358,6 +407,7 @@ let jobFromZipRecruiter = async (
 		source,
 		source_url,
 		date_applied,
+		date_added,
 		company_name,
 		company_website,
 		title,

@@ -48,6 +48,7 @@ library.add(
 
 // API methods import
 import * as api from '../api';
+import { difference } from 'underscore';
 
 // Main app starting point
 class App extends Component {
@@ -181,14 +182,26 @@ class App extends Component {
 		// Calculate the percentage difference between last week and this week
 		let difference_between_weeks = 0;
 
-		difference_between_weeks = (100 *
-			Math.abs((last_week_total - this_week_total) / (last_week_total + this_week_total / 2))).toFixed(2);
+		// Avoid division by 0
+		if (last_week_total != 0) {
+			difference_between_weeks = Math.abs(
+				(this_week_total - last_week_total) / Math.abs(last_week_total) * 100.0
+			).toFixed(2);
+		} else {
+			difference_between_weeks = this_week_total * 100.0;
+		}
 
 		// Calculate the percentage difference between last month and this month
 		let difference_between_months = 0;
 
-		difference_between_months = (100 *
-			Math.abs((last_month_total - this_month_total) / (last_month_total + this_month_total / 2))).toFixed(2);
+		// Avoid division by 0
+		if (last_month_total != 0) {
+			difference_between_months = Math.abs(
+				(this_month_total - last_month_total) / Math.abs(last_month_total) * 100.0
+			).toFixed(2);
+		} else {
+			difference_between_months = this_month_total * 100.0;
+		}
 
 		this.setState({
 			user_stats: {

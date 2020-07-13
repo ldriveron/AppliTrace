@@ -79,10 +79,10 @@ const NewJobFormManual = (props) => (
 				.matches(/^\$?[1-9]\d?(?:,\d{3})*(?:\.\d{2})?$/, 'Use this format example: $50,000'),
 			benefits: Yup.string()
 				.min(3, 'Notes must be 3 characters or longer')
-				.max(250, 'Notes must be 250 characters or less'),
+				.max(400, 'Notes must be 400 characters or less'),
 			description: Yup.string()
 				.min(10, 'Description must be 10 characters or longer')
-				.max(600, 'Description must be 600 characters or less')
+				.max(1000, 'Description must be 1000 characters or less')
 		})}
 	>
 		{(props) => {

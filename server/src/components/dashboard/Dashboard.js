@@ -23,7 +23,7 @@ class Dashboard extends Component {
 		// Set the percentage class to use for percentage equal, drop or gain for the week
 		let week_percent_class;
 		let week_percent_icon;
-		let week_plus_or_minus;
+		let week_plus_or_minus = '';
 		if (
 			this.state.user_stats.last_week_total > this.state.user_stats.total_this_week &&
 			this.state.user_stats.difference_between_weeks != 0
