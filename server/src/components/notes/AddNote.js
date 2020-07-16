@@ -16,9 +16,11 @@ const AddNote = (props) => (
 		}}
 		validationSchema={Yup.object().shape({
 			note: Yup.string()
+				.required('A note is required')
 				.min(3, 'Note must be 3 characters or longer')
-				.max(1000, 'Note must be 1000 characters or less'),
+				.max(2000, 'Note must be 2000 characters or less'),
 			title: Yup.string()
+				.required('A note title is required')
 				.min(3, 'Title must be 3 characters or longer')
 				.max(150, 'Title must be 150 characters or less')
 		})}

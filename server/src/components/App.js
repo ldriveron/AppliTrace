@@ -58,7 +58,7 @@ class App extends Component {
 		user_data: {},
 		search_term: null,
 		search_type: 'all',
-		search_order: '-date_added'
+		search_order: '-date_applied'
 	};
 
 	async componentDidMount() {

@@ -528,10 +528,10 @@ router.get('/userdata/notes/:term', (req, res) => {
 router.post('/userdata/addnote', async (req, res) => {
 	if (req.isAuthenticated()) {
 		let title = req.body.title;
-		let note = req.body.note;
+		let notes = req.body.note;
 		let user_id = req.user.id;
 
-		const newNote = new Note({ user_id, title, note });
+		const newNote = new Note({ user_id, title, notes });
 
 		await newNote.save().catch(console.error);
 

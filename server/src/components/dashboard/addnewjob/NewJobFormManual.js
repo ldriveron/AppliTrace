@@ -65,13 +65,13 @@ const NewJobFormManual = (props) => (
 			email_address: Yup.string().email('Email is not valid'),
 			recruiter_name: Yup.string()
 				.min(3, 'Recruiter name must be 3 characters or longer')
-				.max(25, 'Recruiter name must be 25 characters or less'),
+				.max(60, 'Recruiter name must be 60 characters or less'),
 			location: Yup.string()
 				.min(3, 'Location must be 3 characters or longer')
 				.max(50, 'Location must be 50 characters or less'),
 			notes: Yup.string()
 				.min(3, 'Notes must be 3 characters or longer')
-				.max(250, 'Notes must be 250 characters or less'),
+				.max(2000, 'Notes must be 2000 characters or less'),
 			status: Yup.string().required('Status is required'),
 			salary: Yup.string()
 				.min(3, 'Enter at least three numbers')

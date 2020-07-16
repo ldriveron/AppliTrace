@@ -41,7 +41,7 @@ const NewJobFormExternal = (props) => (
 				),
 			notes: Yup.string()
 				.min(3, 'Notes must be 3 characters or longer')
-				.max(250, 'Notes must be 250 characters or less'),
+				.max(2000, 'Notes must be 2000 characters or less'),
 			salary: Yup.string()
 				.min(3, 'Enter at least three numbers')
 				.max(25, 'Salary cannot exceed 25 characters')

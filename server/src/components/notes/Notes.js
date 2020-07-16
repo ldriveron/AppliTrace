@@ -56,17 +56,19 @@ class Notes extends Component {
 					notes_to_add.unshift(
 						<div
 							className="single_note"
-							onClick={() =>
+							onClick={() => {
 								this.setSelectedNote({
 									company_name: this.props.apps_list.results[app].company_name,
 									title: this.props.apps_list.results[app].title,
 									note: this.props.apps_list.results[app].notes,
 									date: this.props.apps_list.results[app].date_applied,
 									from: 'apps'
-								})}
+								});
+							}}
 							key={
 								this.props.apps_list.results[app].company_name +
-								this.props.apps_list.results[app].date_applied
+								this.props.apps_list.results[app].date_applied +
+								this.props.apps_list.results[app].title
 							}
 						>
 							<div className="note_title">{this.props.apps_list.results[app].company_name}</div>
@@ -103,17 +105,17 @@ class Notes extends Component {
 									id: notes.results[note]._id,
 									title: notes.results[note].title,
 									date: notes.results[note].date_added,
-									note: notes.results[note].note,
+									note: notes.results[note].notes,
 									from: 'notes'
 								})}
 							key={notes.results[note].title + notes.results[note].date_added}
 						>
 							<div className="note_title">{notes.results[note].title}</div>
 							<div className="notes_short_text">
-								{notes.results[note].note.length > 30 ? (
-									notes.results[note].note.substring(0, 30) + '...'
+								{notes.results[note].notes.length > 30 ? (
+									notes.results[note].notes.substring(0, 30) + '...'
 								) : (
-									notes.results[note].note
+									notes.results[note].notes
 								)}
 							</div>
 						</div>
@@ -173,7 +175,7 @@ class Notes extends Component {
 								<div className="empty_apps_list">Select a note to view</div>
 							</div>
 						) : this.state.selected_note.from == 'apps' ? (
-							<div className="note_details">
+							<div id="note_details" className="note_details">
 								<div className="note_title">
 									Note From: {this.state.selected_note.title} at{' '}
 									{this.state.selected_note.company_name}

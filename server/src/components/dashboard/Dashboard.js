@@ -130,11 +130,11 @@ class Dashboard extends Component {
 									value={this.props.search_order}
 									onChange={(e) => this.props.handleSearchOrderChange(e.target.value)}
 								>
+									<option key="date_applied" value="-date_applied">
+										Date Applied
+									</option>
 									<option key="date_added" value="-date_added">
 										Date Added
-									</option>
-									<option key="date_applied" value="date_applied">
-										Date Applied
 									</option>
 									<option key="company_name" value="company_name">
 										Company Name

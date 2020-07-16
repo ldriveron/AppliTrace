@@ -27,13 +27,16 @@ const AddContact = (props) => (
 				.min(2, 'Company name must be 2 characters or longer')
 				.max(70, 'Company name must be 70 characters or less'),
 			location: Yup.string()
+				.required('Contact location is required')
 				.min(3, 'Location must be 3 characters or longer')
 				.max(70, 'Location must be 70 characters or less'),
-			phone_number: Yup.string().matches(
-				/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
-				'Enter a valid phone number'
-			),
-			email_address: Yup.string().email('Email is not valid')
+			phone_number: Yup.string()
+				.required('Contact phone number is required')
+				.matches(
+					/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
+					'Enter a valid phone number'
+				),
+			email_address: Yup.string().required('Contact email address is required').email('Email is not valid')
 		})}
 	>
 		{(props) => {
@@ -101,6 +104,7 @@ const AddContact = (props) => (
 								onBlur={handleBlur}
 								className={errors.location && touched.location && 'error'}
 								placeholder="Enter a location for the contact"
+								required
 							/>
 							{errors.location &&
 							touched.location && <div className="input_feedback">{errors.location}</div>}
@@ -118,6 +122,7 @@ const AddContact = (props) => (
 								onBlur={handleBlur}
 								className={errors.phone_number && touched.phone_number && 'error'}
 								placeholder="Enter a phone number for the contact"
+								required
 							/>
 							{errors.phone_number &&
 							touched.phone_number && <div className="input_feedback">{errors.phone_number}</div>}
@@ -135,6 +140,7 @@ const AddContact = (props) => (
 								onBlur={handleBlur}
 								className={errors.email_address && touched.email_address && 'error'}
 								placeholder="Enter an email address for the contact"
+								required
 							/>
 							{errors.email_address &&
 							touched.email_address && <div className="input_feedback">{errors.email_address}</div>}
