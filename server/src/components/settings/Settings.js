@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 // Import components
 import WeekView from '../weekview/WeekView';
 import EditProfile from './EditProfile';
-import EditPrivacy from './EditPrivacy';
 import EditPassword from './EditPassword';
 import DeleteAccount from './DeleteAccount';
 
@@ -16,7 +15,6 @@ const Settings = (props) => {
 	let occupation = props.user_data.occupation;
 	let region = props.user_data.region;
 	let country = props.user_data.country;
-	let account_private = props.user_data.private;
 
 	return (
 		<div className="settings">
@@ -27,10 +25,6 @@ const Settings = (props) => {
 					<div className="settings_links">
 						<NavLink key="edit_profile" to="/users/settings/profile" activeClassName="active_link">
 							<div className="link middle_link">Edit Profile</div>
-						</NavLink>
-
-						<NavLink key="edit_privacy" to="/users/settings/privacy" activeClassName="active_link">
-							<div className="link middle_link">Edit Privacy</div>
 						</NavLink>
 
 						<NavLink key="edit_password" to="/users/settings/password" activeClassName="active_link">
@@ -57,13 +51,6 @@ const Settings = (props) => {
 										country={country}
 									/>
 								)}
-							/>
-
-							{/* Edit Privacy Route */}
-							<Route
-								path="/users/settings/privacy"
-								exact
-								render={(props) => <EditPrivacy {...props} account_private={account_private} />}
 							/>
 
 							{/* Edit Password Route */}

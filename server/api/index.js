@@ -36,8 +36,7 @@ router.get('/userdata', async (req, res) => {
 					desired_job_locations: user.desired_job_locations,
 					job_applications_total: user.job_applications_total,
 					region: user.region,
-					country: user.country,
-					private: user.private
+					country: user.country
 				}
 			});
 		});
@@ -501,7 +500,7 @@ router.get('/userdata/notes/:term', (req, res) => {
 
 		if (term != 'null') {
 			Note.find({
-				$or: [ { note: { $regex: new RegExp(term, 'i') } }, { title: { $regex: new RegExp(term, 'i') } } ],
+				$or: [ { notes: { $regex: new RegExp(term, 'i') } }, { title: { $regex: new RegExp(term, 'i') } } ],
 				$and: [ { user_id: req.user.id } ]
 			}).then((notes) => {
 				if (notes.length !== 0) {
@@ -650,30 +649,6 @@ router.post('/userdata/editprofile', async (req, res) => {
 						res.redirect('/users/dashboard');
 					}
 				});
-			}
-		});
-	} else {
-		res.redirect('/users/login');
-	}
-});
-
-// Edit user's privacy setting
-router.post('/userdata/editprivacy', (req, res) => {
-	if (req.isAuthenticated()) {
-		User.findOne({ _id: req.user.id }).then(async (user) => {
-			// Check if the user's account is set to private
-			if (user.private == true) {
-				// If the user's account is set to private, set it to public by changing private to false
-				await user.updateOne({ private: false });
-
-				req.flash('user_alert', 'Your account is now public');
-				res.redirect('/users/dashboard');
-			} else if (user.private == false) {
-				// If the user's account is set to public, set it to private by changing private to true
-				await user.updateOne({ private: true });
-
-				req.flash('user_alert', 'Your account is now private');
-				res.redirect('/users/dashboard');
 			}
 		});
 	} else {

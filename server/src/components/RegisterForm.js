@@ -12,7 +12,7 @@ const RegisterForm = () => (
 	<Formik
 		initialValues={{
 			username: '',
-			industry: '',
+			industry: 'Information Technology and Services',
 			occupation: '',
 			country: '',
 			region: '',
@@ -27,9 +27,6 @@ const RegisterForm = () => (
 				.required('Username is required')
 				.min(3, 'Username must be 3 characters or longer')
 				.max(15, 'Username must be 15 characters or less'),
-			industry: Yup.string()
-				.min(3, 'Industry must be 3 characters or longer')
-				.max(70, 'Industry must be 70 characters or less'),
 			occupation: Yup.string()
 				.min(3, 'Occupation must be 3 characters or longer')
 				.max(15, 'Occupation must be 150 characters or less'),
@@ -61,6 +58,166 @@ const RegisterForm = () => (
 			function selectRegion(val) {
 				setRegion(val);
 				values.region = region;
+			}
+
+			// Array with industry names
+			let industry_names = [
+				'Information Technology and Services',
+				'Hospital & Health Care',
+				'Construction',
+				'Education Management',
+				'Retail',
+				'Financial Services',
+				'Accounting',
+				'Computer Software',
+				'Automotive',
+				'Higher Education',
+				'Marketing & Advertising',
+				'Government Administration',
+				'Banking',
+				'Health, Welness & Fitness',
+				'Real Estate',
+				'Telecommunications',
+				'Oil & Energy',
+				'Food & Beverages',
+				'Hospitality',
+				'Mechanical or Industrial Engineering',
+				'Electrical & Electronic Manufacturing',
+				'Primary / Secondary Education',
+				'Insurance',
+				'Internet',
+				'Human Resources',
+				'Medical Practice',
+				'Transportation / Trucking / Railroad',
+				'Consumer Services',
+				'Management Consulting',
+				'Pharmaceuticals',
+				'Civil Engineering',
+				'Design',
+				'Research',
+				'Restaurants',
+				'Logistics & Supply Chain',
+				'Architecture & Planning',
+				'Law Practice',
+				'Apparel & Fashion',
+				'Consumer Goods',
+				'Facilities Services',
+				'Food Production',
+				'Non - profit Organization Management',
+				'Entertainment',
+				'Machinery',
+				'Chemicals',
+				'Arts & Crafts',
+				'Wholesale',
+				'Utilities',
+				'Legal Services',
+				'Farming',
+				'Mining & Metals',
+				'Airlines / Aviation',
+				'Leisure, Travel & Turism',
+				'Building Materials',
+				'Music',
+				'Enviromental Services',
+				'Professional Training & Coaching',
+				'Medical Device',
+				'Individual & Family Services',
+				'Cosmetics',
+				'Mental Health Care',
+				'Aviation and Aerospace',
+				'Staffing & Recruiting',
+				'Industrial Automation',
+				'Graphic Design',
+				'Security & Investigations',
+				'Import and Export',
+				'Public Relations and Communications',
+				'Textiles',
+				'Military',
+				'Broadcast Media',
+				'Biotechnology',
+				'Media Production',
+				'Business Supplies & Equipment',
+				'Computer Networking',
+				'Writing & Editing',
+				'Consumer Elecronics',
+				'International Trade and Development',
+				'Events Services',
+				'Photography',
+				'Renewables & Envirnoment',
+				'Computer Hardware',
+				'Civic and Social Organization',
+				'Furniture',
+				'Defense & Space',
+				'Computer & Network Security',
+				'Printing',
+				'Fine Art',
+				'Religious Institutions',
+				'Investmend Management',
+				'Law Enforcement',
+				'Publishing',
+				'Information Services',
+				'Maritime',
+				'Outsourcing / Offshoring',
+				'Warehousing',
+				'E - learning',
+				'Executive Office',
+				'Government Relations',
+				'Animation',
+				'Semiconducs',
+				'Supermarkets',
+				'Program Development',
+				'Public Safety',
+				'Plastics',
+				'Alternative Medicine',
+				'Performing Arts',
+				'Online Media',
+				'Motion Pictures & Film',
+				'Commercial Real Estate',
+				'Judiciary',
+				'Packaging and Containers',
+				'Luxury Goods & Jewelry',
+				'Veterinary',
+				'Computer Games',
+				'Investment Banking',
+				'Market Research',
+				'International Affairs',
+				'Wine & Spirits',
+				'Newspapers',
+				'Translation & Localisation',
+				'Recreational Facilities & Services',
+				'Sporting Goods',
+				'Paper & Forest Products',
+				'Capital Markets',
+				'Public Policy',
+				'Package / Freight Delivery',
+				'Libraries',
+				'Wireless',
+				'Gambling & Casinos',
+				'Venture Capital & Private Equity',
+				'Glass, Ceramics & Concrete',
+				'Philanthropy',
+				'Ranching',
+				'Dairy',
+				'Museums and Institutions',
+				'Shipbuilding',
+				'Think Thanks',
+				'Political Organization',
+				'Fishery',
+				'Fund - Raising',
+				'Tobacco',
+				'Railroad Manufacture',
+				'Alternative Dispute Resolution',
+				'Nanotechnology',
+				'Legislative Office'
+			];
+
+			// Populate industry_list array with options for the industry select dropdowwn
+			let industry_list = [];
+			for (let i = 0; i < industry_names.length; i++) {
+				industry_list.push(
+					<option key={industry_names[i]} value={industry_names[i]}>
+						{industry_names[i]}
+					</option>
+				);
 			}
 
 			return (
@@ -144,24 +301,23 @@ const RegisterForm = () => (
 								touched.password2 && <div className="input_feedback">{errors.password2}</div>}
 							</div>
 							<br />
-							<div className="Industry" style={{ width: '250px', float: 'left' }}>
-								<label htmlFor="industry">Industry (Optional)</label>
+							<div className="Industry" style={{ width: '315px', float: 'left' }}>
+								<label htmlFor="industry">Industry</label>
 								<br />
-								<input
-									type="text"
-									id="industry"
+								<select
 									name="industry"
-									value={values.industry}
+									id="industry"
 									onChange={handleChange}
-									className={errors.industry && touched.industry && 'error'}
 									onBlur={handleBlur}
-									placeholder="Enter your desired industry"
-								/>
+									value={values.industry}
+								>
+									{industry_list}
+								</select>
 								{errors.industry &&
 								touched.industry && <div className="input_feedback">{errors.industry}</div>}
 							</div>
 
-							<div className="Occupation" style={{ width: '250px', float: 'left', marginLeft: '50px' }}>
+							<div className="Occupation" style={{ width: '315px', float: 'left', marginLeft: '50px' }}>
 								<label htmlFor="occupation">Occupation (Optional)</label>
 								<br />
 								<input
@@ -183,8 +339,8 @@ const RegisterForm = () => (
 							<br />
 							<br />
 
-							<div className="Country" style={{ width: '250px', float: 'left' }}>
-								<label htmlFor="country">Country (Optional)</label>
+							<div className="Country" style={{ width: '315px', float: 'left' }}>
+								<label htmlFor="country">Country</label>
 								<br />
 								<CountryDropdown
 									name="country"
@@ -197,8 +353,8 @@ const RegisterForm = () => (
 								/>
 							</div>
 
-							<div className="Region" style={{ width: '250px', float: 'left', marginLeft: '50px' }}>
-								<label htmlFor="region">Region (Optional)</label>
+							<div className="Region" style={{ width: '315px', float: 'left', marginLeft: '50px' }}>
+								<label htmlFor="region">Region</label>
 								<br />
 								<RegionDropdown
 									name="region"
@@ -206,7 +362,7 @@ const RegisterForm = () => (
 									value={values.region}
 									onBlur={handleBlur}
 									country={values.country}
-									disableWhenEmpty="true"
+									disableWhenEmpty={true}
 									onChange={(val) => {
 										selectRegion(val), (values.region = val);
 									}}

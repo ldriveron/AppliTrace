@@ -85,8 +85,7 @@ class App extends Component {
 								desired_job_locations: resp.user.desired_job_locations,
 								job_applications_total: resp.user.job_applications_total,
 								region: resp.user.region,
-								country: resp.user.country,
-								private: resp.user.private
+								country: resp.user.country
 							}
 						});
 					})
@@ -99,18 +98,18 @@ class App extends Component {
 						apps_list_full: resp
 					});
 				});
+
+				let today = new Date();
+				let this_month = today.getMonth() == 11 ? 1 : today.getMonth() + 1;
+
+				// Doing this here so that the user stats will only be calculated once
+				await this.calculateWeekanMonthStats(today, this_month);
 			} else {
 				this.setState({
 					isLoggedIn: false
 				});
 			}
 		});
-
-		let today = new Date();
-		let this_month = today.getMonth() == 11 ? 1 : today.getMonth() + 1;
-
-		// Doing this here so that the user stats will only be calculated once
-		await this.calculateWeekanMonthStats(today, this_month);
 	}
 
 	calculateWeekanMonthStats(today, this_month) {

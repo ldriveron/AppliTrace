@@ -47,9 +47,12 @@ class Notes extends Component {
 		// Loop through all notes and add to side scroll bar
 		if (this.props.apps_list.total_results != 0) {
 			for (let app = 0; app < this.props.apps_list.results.length; app++) {
+				// If the term is not null, then compare the notes to the search term
+				// If there is a match, then make sure the note is not empty or null
 				if (
 					term != null
-						? new RegExp(term, 'i').test(this.props.apps_list.results[app].notes)
+						? new RegExp(term, 'i').test(this.props.apps_list.results[app].notes) ||
+							new RegExp(term, 'i').test(this.props.apps_list.results[app].company_name)
 						: this.props.apps_list.results[app].notes != '' &&
 							this.props.apps_list.results[app].notes != null
 				) {

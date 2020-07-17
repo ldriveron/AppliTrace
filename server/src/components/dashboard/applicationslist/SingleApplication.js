@@ -39,6 +39,10 @@ const SingleApplication = (props) => {
 							<div className="label">Date Applied</div>
 							<div className="app_number">{props.application.date_applied}</div>
 						</div>
+						<div className="info" style={{ width: '100%' }}>
+							<div className="label">Location</div>
+							<div className="app_number">{props.application.location}</div>
+						</div>
 						<div className="info">
 							<div className="label">Date Added</div>
 							<div className="app_number">{props.application.date_added}</div>

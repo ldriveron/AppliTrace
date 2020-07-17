@@ -59,13 +59,17 @@ const ApplicationsList = (props) => {
 							<div className="label">Source</div>
 							<div className="app_number">{props.list.results[app].source}</div>
 						</div>
-						<div className="info" style={{ width: '100%' }}>
+						<div className="info">
 							<div className="label">Date Applied</div>
 							<div className="app_number">{props.list.results[app].date_applied}</div>
 						</div>
 						<div className="info">
 							<div className="label">Date Added</div>
 							<div className="app_number">{props.list.results[app].date_added}</div>
+						</div>
+						<div className="info" style={{ width: '100%' }}>
+							<div className="label">Location</div>
+							<div className="app_number">{props.list.results[app].location}</div>
 						</div>
 						<div className={'status ' + props.list.results[app].status}>
 							{props.list.results[app].status}
