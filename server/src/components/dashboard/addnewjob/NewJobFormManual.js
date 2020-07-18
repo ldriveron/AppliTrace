@@ -125,29 +125,31 @@ const NewJobFormManual = (props) => (
 						<div className="source">
 							<label htmlFor="source">Source</label>
 							<br />
-							<select
-								name="source"
-								id="source"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								value={values.source}
-							>
-								<option key="Manual" value="Manual">
-									Manual
-								</option>
-								<option key="Indeed" value="Indeed">
-									Indeed
-								</option>
-								<option key="LinkedIn" value="LinkedIn">
-									LinkedIn
-								</option>
-								<option key="ZipRecruiter" value="ZipRecruiter">
-									ZipRecruiter
-								</option>
-								<option key="Snagajob" value="Snagajob">
-									Snagajob
-								</option>
-							</select>
+							<div className="select_wrapper_long">
+								<select
+									name="source"
+									id="source"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.source}
+								>
+									<option key="Manual" value="Manual">
+										Manual
+									</option>
+									<option key="Indeed" value="Indeed">
+										Indeed
+									</option>
+									<option key="LinkedIn" value="LinkedIn">
+										LinkedIn
+									</option>
+									<option key="ZipRecruiter" value="ZipRecruiter">
+										ZipRecruiter
+									</option>
+									<option key="Snagajob" value="Snagajob">
+										Snagajob
+									</option>
+								</select>
+							</div>
 						</div>
 						<br />
 						<div className="source_url">
@@ -170,41 +172,43 @@ const NewJobFormManual = (props) => (
 						<div className="status">
 							<label htmlFor="status">Status</label>
 							<br />
-							<select
-								name="status"
-								id="status"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								value={values.status}
-							>
-								<option key="Applied" value="Applied">
-									Applied
-								</option>
-								<option key="Viewed" value="Viewed">
-									Viewed
-								</option>
-								<option key="Under Review" value="Under Review">
-									Under Review
-								</option>
-								<option key="Contacted" value="Contacted">
-									Contacted
-								</option>
-								<option key="Screening Interview" value="Screening Interview">
-									Screening Interview
-								</option>
-								<option key="Technical Interview" value="Technical Interview">
-									Technical Interview
-								</option>
-								<option key="Offer" value="Offer">
-									Offer
-								</option>
-								<option key="Rejected" value="Rejected">
-									Rejected
-								</option>
-								<option key="Declined Offer" value="Declined Offer">
-									Declined Offer
-								</option>
-							</select>
+							<div className="select_wrapper_long">
+								<select
+									name="status"
+									id="status"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.status}
+								>
+									<option key="Applied" value="Applied">
+										Applied
+									</option>
+									<option key="Viewed" value="Viewed">
+										Viewed
+									</option>
+									<option key="Under Review" value="Under Review">
+										Under Review
+									</option>
+									<option key="Contacted" value="Contacted">
+										Contacted
+									</option>
+									<option key="Screening Interview" value="Screening Interview">
+										Screening Interview
+									</option>
+									<option key="Technical Interview" value="Technical Interview">
+										Technical Interview
+									</option>
+									<option key="Offer" value="Offer">
+										Offer
+									</option>
+									<option key="Rejected" value="Rejected">
+										Rejected
+									</option>
+									<option key="Declined Offer" value="Declined Offer">
+										Declined Offer
+									</option>
+								</select>
+							</div>
 						</div>
 						<br />
 						<div className="company_name">

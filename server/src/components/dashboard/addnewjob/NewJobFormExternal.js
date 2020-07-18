@@ -115,35 +115,37 @@ const NewJobFormExternal = (props) => (
 						<div className="status">
 							<label htmlFor="status">Status</label>
 							<br />
-							<select
-								name="status"
-								id="status"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								value={values.status}
-							>
-								<option key="Applied" value="Applied">
-									Applied
-								</option>
-								<option key="Contacted" value="Contacted">
-									Contacted
-								</option>
-								<option key="Screening Interview" value="Screening Interview">
-									Screening Interview
-								</option>
-								<option key="Technical Interview" value="Technical Interview">
-									Technical Interview
-								</option>
-								<option key="Offer" value="Offer">
-									Offer
-								</option>
-								<option key="Rejected" value="Rejected">
-									Rejected
-								</option>
-								<option key="Declired Offer" value="Contacted">
-									Declined Offer
-								</option>
-							</select>
+							<div className="select_wrapper_long">
+								<select
+									name="status"
+									id="status"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.status}
+								>
+									<option key="Applied" value="Applied">
+										Applied
+									</option>
+									<option key="Contacted" value="Contacted">
+										Contacted
+									</option>
+									<option key="Screening Interview" value="Screening Interview">
+										Screening Interview
+									</option>
+									<option key="Technical Interview" value="Technical Interview">
+										Technical Interview
+									</option>
+									<option key="Offer" value="Offer">
+										Offer
+									</option>
+									<option key="Rejected" value="Rejected">
+										Rejected
+									</option>
+									<option key="Declired Offer" value="Contacted">
+										Declined Offer
+									</option>
+								</select>
+							</div>
 						</div>
 						<br />
 						<div className="recruiter_name">

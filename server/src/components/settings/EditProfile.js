@@ -237,17 +237,18 @@ const EditProfile = (props) => (
 						<br />
 						<br />
 						<label>Industry</label>
-						<select
-							name="industry"
-							id="industry"
-							defaultValue={values.industry}
-							onChange={handleChange}
-							onBlur={handleBlur}
-						>
-							{industry_list}
-						</select>
+						<div className="select_wrapper">
+							<select
+								name="industry"
+								id="industry"
+								defaultValue={values.industry}
+								onChange={handleChange}
+								onBlur={handleBlur}
+							>
+								{industry_list}
+							</select>
+						</div>
 
-						<br />
 						<br />
 						<label>Occupation (Optional)</label>
 						<input
@@ -264,31 +265,35 @@ const EditProfile = (props) => (
 						<br />
 						<br />
 						<label>Country</label>
-						<CountryDropdown
-							name="country"
-							id="country"
-							value={values.country}
-							onBlur={handleBlur}
-							onChange={(val) => {
-								selectCountry(val), (values.country = val);
-							}}
-						/>
+						<div className="select_wrapper">
+							<CountryDropdown
+								name="country"
+								id="country"
+								value={values.country}
+								onBlur={handleBlur}
+								onChange={(val) => {
+									selectCountry(val), (values.country = val);
+								}}
+							/>
+						</div>
 
 						<br />
 						<br />
 						<label>State</label>
 						<br />
-						<RegionDropdown
-							name="region"
-							id="region"
-							value={values.region}
-							onBlur={handleBlur}
-							country={values.country}
-							disableWhenEmpty={true}
-							onChange={(val) => {
-								selectRegion(val), (values.region = val);
-							}}
-						/>
+						<div className="select_wrapper">
+							<RegionDropdown
+								name="region"
+								id="region"
+								value={values.region}
+								onBlur={handleBlur}
+								country={values.country}
+								disableWhenEmpty={true}
+								onChange={(val) => {
+									selectRegion(val), (values.region = val);
+								}}
+							/>
+						</div>
 
 						<button type="submit" className="formButton" disabled={errors.username || isSubmitting}>
 							Update Profile

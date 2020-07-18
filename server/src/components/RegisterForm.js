@@ -304,15 +304,17 @@ const RegisterForm = () => (
 							<div className="Industry" style={{ width: '315px', float: 'left' }}>
 								<label htmlFor="industry">Industry</label>
 								<br />
-								<select
-									name="industry"
-									id="industry"
-									onChange={handleChange}
-									onBlur={handleBlur}
-									value={values.industry}
-								>
-									{industry_list}
-								</select>
+								<div className="select_wrapper">
+									<select
+										name="industry"
+										id="industry"
+										onChange={handleChange}
+										onBlur={handleBlur}
+										value={values.industry}
+									>
+										{industry_list}
+									</select>
+								</div>
 								{errors.industry &&
 								touched.industry && <div className="input_feedback">{errors.industry}</div>}
 							</div>
@@ -342,31 +344,35 @@ const RegisterForm = () => (
 							<div className="Country" style={{ width: '315px', float: 'left' }}>
 								<label htmlFor="country">Country</label>
 								<br />
-								<CountryDropdown
-									name="country"
-									id="country"
-									value={values.country}
-									onBlur={handleBlur}
-									onChange={(val) => {
-										selectCountry(val), (values.country = val);
-									}}
-								/>
+								<div className="select_wrapper">
+									<CountryDropdown
+										name="country"
+										id="country"
+										value={values.country}
+										onBlur={handleBlur}
+										onChange={(val) => {
+											selectCountry(val), (values.country = val);
+										}}
+									/>
+								</div>
 							</div>
 
 							<div className="Region" style={{ width: '315px', float: 'left', marginLeft: '50px' }}>
 								<label htmlFor="region">Region</label>
 								<br />
-								<RegionDropdown
-									name="region"
-									id="region"
-									value={values.region}
-									onBlur={handleBlur}
-									country={values.country}
-									disableWhenEmpty={true}
-									onChange={(val) => {
-										selectRegion(val), (values.region = val);
-									}}
-								/>
+								<div className="select_wrapper">
+									<RegionDropdown
+										name="region"
+										id="region"
+										value={values.region}
+										onBlur={handleBlur}
+										country={values.country}
+										disableWhenEmpty={true}
+										onChange={(val) => {
+											selectRegion(val), (values.region = val);
+										}}
+									/>
+								</div>
 							</div>
 
 							<div style={{ width: '100%', display: 'inline-block' }}>
