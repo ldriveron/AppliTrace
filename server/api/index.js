@@ -235,8 +235,8 @@ router.post('/userdata/newjobexternal/:source', async (req, res) => {
 				break;
 		}
 
-		// Only add the job application if both title and company name were found
-		if (newJob.title != '' && newJob.company_name != '') {
+		// Only add the job application if both title, company name, and location were found
+		if (newJob.title != '' && newJob.company_name != '' && newJob.location != '') {
 			// Get rid of the '-' that Indeed adds to company name
 			if (source == 'Indeed') {
 				newJob.company_name = newJob.company_name.substr(0, newJob.company_name.length - 1);

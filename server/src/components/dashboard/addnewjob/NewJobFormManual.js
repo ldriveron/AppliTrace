@@ -67,6 +67,7 @@ const NewJobFormManual = (props) => (
 				.min(3, 'Recruiter name must be 3 characters or longer')
 				.max(60, 'Recruiter name must be 60 characters or less'),
 			location: Yup.string()
+				.required('Location is required')
 				.min(3, 'Location must be 3 characters or longer')
 				.max(50, 'Location must be 50 characters or less'),
 			notes: Yup.string()
@@ -275,6 +276,7 @@ const NewJobFormManual = (props) => (
 								onBlur={handleBlur}
 								className={errors.location && touched.location && 'error'}
 								placeholder="Enter a location for the company"
+								required
 							/>
 							{errors.location &&
 							touched.location && <div className="input_feedback">{errors.location}</div>}
