@@ -21,7 +21,11 @@ class Contacts extends Component {
 	};
 
 	componentDidMount() {
-		this.loadContacts(this.state.search_term);
+		//this.loadContacts(this.state.search_term);
+
+		let contacts_from_apps = this.loadContactsFromApps();
+
+		this.loadContacts(contacts_from_apps, null);
 
 		document.title = 'Contacts';
 	}
@@ -29,15 +33,98 @@ class Contacts extends Component {
 	//Set the contacts search term
 	handleContactsSearch(term) {
 		if (this.state.search_term != term && /^[a-z0-9]+$/i.test(term) && term != '') {
-			this.loadContacts(term);
-			this.setState({ search_term: term });
+			//this.loadContacts(term);
+			//this.setState({ search_term: term });
+
+			let contacts_from_apps = this.loadContactsFromApps(term);
+			this.loadContacts(contacts_from_apps, term);
 		} else {
-			this.loadContacts(null);
-			this.setState({ search_term: null });
+			//this.loadContacts(null);
+			//this.setState({ search_term: null });
+			let contacts_from_apps = this.loadContactsFromApps(null);
+			this.loadContacts(contacts_from_apps, null);
 		}
 	}
 
-	loadContacts(term) {
+	loadContactsFromApps(term) {
+		// Array to hold contacts
+		let contacts_to_add = [];
+
+		// Loop through all applications if the apps_list is not empty
+		if (this.props.apps_list_full.total_results != 0) {
+			for (let app = 0; app < this.props.apps_list_full.results.length; app++) {
+				// Only add to contacts list from application if recruiter name, company name, location, phone number,
+				// and email address are included
+				if (
+					this.props.apps_list_full.results[app].recruiter_name != '' &&
+					this.props.apps_list_full.results[app].company_name != '' &&
+					this.props.apps_list_full.results[app].location != '' &&
+					this.props.apps_list_full.results[app].phone_number != '' &&
+					this.props.apps_list_full.results[app].email_address != ''
+				) {
+					// If the term is not null, then compare the contact to the search term
+					// If there is a match, then add it to the contacts list
+					// If there no search term, then just set if statement to true
+					if (
+						term != null
+							? new RegExp(term, 'i').test(this.props.apps_list_full.results[app].recruiter_name) ||
+								new RegExp(term, 'i').test(this.props.apps_list_full.results[app].company_name) ||
+								new RegExp(term, 'i').test(this.props.apps_list_full.results[app].location) ||
+								new RegExp(term, 'i').test(this.props.apps_list_full.results[app].phone_number) ||
+								new RegExp(term, 'i').test(this.props.apps_list_full.results[app].email_address)
+							: true
+					) {
+						contacts_to_add.unshift(
+							<div
+								className="single_contact"
+								key={
+									this.props.apps_list_full.results[app].recruiter_name +
+									this.props.apps_list_full.results[app].phone_number
+								}
+							>
+								<div className="contact_name">
+									<div className="name_circle">
+										{this.props.apps_list_full.results[app].recruiter_name.substring(0, 1)}
+									</div>
+									<span style={{ marginLeft: '20px' }}>
+										{this.props.apps_list_full.results[app].recruiter_name}
+									</span>
+								</div>
+								<div className="contact_details">
+									<FontAwesomeIcon icon={faBuilding} />
+									<span className="detail_text">
+										{this.props.apps_list_full.results[app].company_name}
+									</span>
+									<br />
+									<br />
+									<FontAwesomeIcon icon={faPhoneAlt} />
+									<span className="detail_text">
+										{this.props.apps_list_full.results[app].phone_number}
+									</span>
+									<br />
+									<br />
+									<FontAwesomeIcon icon={faMapPin} />
+									<span className="detail_text">
+										{this.props.apps_list_full.results[app].location}
+									</span>
+									<br />
+									<br />
+									<FontAwesomeIcon icon={faAt} />
+									<span className="detail_text">
+										{this.props.apps_list_full.results[app].email_address}
+									</span>
+								</div>
+							</div>
+						);
+					}
+				}
+			}
+		}
+
+		return contacts_to_add;
+	}
+
+	loadContacts(contacts_from_apps, term) {
 		// Array to hold contacts
 		let contacts_to_add = [];
 
@@ -83,7 +170,7 @@ class Contacts extends Component {
 				}
 			}
 
-			this.setState({ contacts: contacts_to_add });
+			this.setState({ contacts: contacts_from_apps.concat(contacts_to_add) });
 		});
 	}
 
@@ -104,6 +191,7 @@ class Contacts extends Component {
 						/>
 
 						{/* New contact button */}
+						{/* Clicking this will change the current_view state to either add_contact or view_all */}
 						<div
 							className="add_contact_button"
 							onClick={() => {
@@ -115,6 +203,7 @@ class Contacts extends Component {
 							+ New Contact
 						</div>
 
+						{/* If the user has no contacts, then say no contacts found, else show the list of contacts */}
 						{this.state.current_view == 'view_all' ? this.state.contacts.length == 0 ? (
 							<div className="empty_contacts">No contacts found</div>
 						) : (
@@ -136,7 +225,8 @@ class Contacts extends Component {
 
 Contacts.propTypes = {
 	user_id: PropTypes.string,
-	user_data: PropTypes.object
+	user_data: PropTypes.object,
+	apps_list_full: PropTypes.object
 };
 
 export default Contacts;

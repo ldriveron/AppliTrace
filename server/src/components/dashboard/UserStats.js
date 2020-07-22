@@ -31,6 +31,16 @@ const UserStats = (props) => {
 	let this_month_total = 0;
 	let last_month_total = 0;
 
+	let total_applied = 0;
+	let total_viewed = 0;
+	let total_under_review = 0;
+	let total_contacted = 0;
+	let total_screening_interview = 0;
+	let total_technical_interview = 0;
+	let total_offer = 0;
+	let total_rejected = 0;
+	let total_declined_offer = 0;
+
 	// Loop through all applications
 	if (props.apps_list_full.total_results != 0) {
 		for (let app = 0; app < props.apps_list_full.results.length; app++) {
@@ -69,6 +79,36 @@ const UserStats = (props) => {
 				(this_month == 1 ? 12 : this_month - 1)
 			) {
 				last_month_total++;
+			}
+
+			switch (props.apps_list_full.results[app].status) {
+				case 'Applied':
+					total_applied++;
+					break;
+				case 'Viewed':
+					total_viewed++;
+					break;
+				case 'Under Review':
+					total_under_review++;
+					break;
+				case 'Contacted':
+					total_contacted++;
+					break;
+				case 'Screening Interview':
+					total_screening_interview++;
+					break;
+				case 'Technical Interview':
+					total_technical_interview++;
+					break;
+				case 'Offer':
+					total_offer++;
+					break;
+				case 'Rejected':
+					total_rejected++;
+					break;
+				case 'Declined Offer':
+					total_declined_offer++;
+					break;
 			}
 		}
 	}
@@ -139,39 +179,79 @@ const UserStats = (props) => {
 
 	return (
 		<div className="user_stats_holder">
-			<div className="user_stat">
-				<div className="type">Total Applications</div>
-				<div className="count">{props.user_applications_total}</div>
-				<div className="percent_change">Since {props.user_join_date}</div>
-			</div>
-			<div className="user_stat">
-				<div className="tooltip bottom">
-					<div className="type">Total This Week</div>
-					<div className="count">{this_week_total}</div>
-					<div className={week_percent_class}>
-						<span style={{ marginRight: '5px' }}>
-							<FontAwesomeIcon icon={week_percent_icon} />
+			<div className="user_stats_compare">
+				<div className="user_stat">
+					<div className="type">Total Applications</div>
+					<div className="count">{props.user_applications_total}</div>
+					<div className="percent_change">Since {props.user_join_date}</div>
+				</div>
+				<div className="user_stat">
+					<div className="tooltip bottom">
+						<div className="type">Total This Week</div>
+						<div className="count">{this_week_total}</div>
+						<div className={week_percent_class}>
+							<span style={{ marginRight: '5px' }}>
+								<FontAwesomeIcon icon={week_percent_icon} />
+							</span>
+							{week_plus_or_minus + difference_between_weeks}%
+						</div>
+						<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
+							Compared to {last_week_total} last week
 						</span>
-						{week_plus_or_minus + difference_between_weeks}%
 					</div>
-					<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
-						Compared to {last_week_total} last week
-					</span>
+				</div>
+				<div className="user_stat">
+					<div className="tooltip bottom">
+						<div className="type">Total This Month</div>
+						<div className="count">{this_month_total}</div>
+						<div className={month_percent_class}>
+							<span style={{ marginRight: '5px' }}>
+								<FontAwesomeIcon icon={month_percent_icon} />
+							</span>
+							{month_plus_or_minus + difference_between_months}%
+						</div>
+						<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
+							Compared to {last_month_total} last month
+						</span>
+					</div>
 				</div>
 			</div>
-			<div className="user_stat">
-				<div className="tooltip bottom">
-					<div className="type">Total This Month</div>
-					<div className="count">{this_month_total}</div>
-					<div className={month_percent_class}>
-						<span style={{ marginRight: '5px' }}>
-							<FontAwesomeIcon icon={month_percent_icon} />
-						</span>
-						{month_plus_or_minus + difference_between_months}%
-					</div>
-					<span className="tiptext" style={{ marginTop: '5px', marginLeft: '-83px' }}>
-						Compared to {last_month_total} last month
-					</span>
+			<div className="user_stats_compare">
+				<div className="status_total">
+					<span className="status_name">Applied</span>
+					<div className="status_number">{total_applied}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Viewed</div>
+					<div className="status_number">{total_viewed}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Review</div>
+					<div className="status_number">{total_under_review}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Contacted</div>
+					<div className="status_number">{total_contacted}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Screening</div>
+					<div className="status_number">{total_screening_interview}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Technical</div>
+					<div className="status_number">{total_technical_interview}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Offer</div>
+					<div className="status_number">{total_offer}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Rejected</div>
+					<div className="status_number">{total_rejected}</div>
+				</div>
+				<div className="status_total">
+					<div className="status_name">Declined</div>
+					<div className="status_number">{total_declined_offer}</div>
 				</div>
 			</div>
 		</div>

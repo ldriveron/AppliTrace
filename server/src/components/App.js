@@ -208,7 +208,12 @@ class App extends Component {
 							path="/users/contacts"
 							exact
 							render={(props) => (
-								<Contacts {...props} user_id={this.state.user_id} user_data={this.state.user_data} />
+								<Contacts
+									{...props}
+									user_id={this.state.user_id}
+									user_data={this.state.user_data}
+									apps_list_full={this.state.apps_list_full}
+								/>
 							)}
 						/>
 
