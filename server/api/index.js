@@ -88,7 +88,8 @@ router.get('/jobs/search/:term/:type/:order', (req, res) => {
 					{ title: { $regex: new RegExp(term, 'i') } },
 					{ status: { $regex: new RegExp(term, 'i') } },
 					{ location: { $regex: new RegExp(term, 'i') } }
-				]
+				],
+				$and: [ { user_id: req.user.id } ]
 			})
 				.sort(order)
 				.then((apps) => {

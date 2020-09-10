@@ -78,8 +78,7 @@ class Contacts extends Component {
 							<div
 								className="single_contact"
 								key={
-									this.props.apps_list_full.results[app].recruiter_name +
-									this.props.apps_list_full.results[app].phone_number
+									this.props.apps_list_full.results[app]._id
 								}
 							>
 								<div className="contact_name">
@@ -135,7 +134,7 @@ class Contacts extends Component {
 					contacts_to_add.unshift(
 						<div
 							className="single_contact"
-							key={contacts.results[contact].name + contacts.results[contact].phone_number}
+							key={contacts.results[contact]._id}
 						>
 							<div className="contact_name">
 								<div className="name_circle">{contacts.results[contact].name.substring(0, 1)}</div>

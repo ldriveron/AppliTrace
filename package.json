@@ -17,14 +17,7 @@
 		"build": "webpack --mode production && npm run clean && npm run build-server",
 		"heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
 	},
-	"keywords": [
-		"job",
-		"applications",
-		"job applications",
-		"application trace",
-		"find work",
-		"find job"
-	],
+	"keywords": [ "job", "applications", "job applications", "application trace", "find work", "find job" ],
 	"author": "Luis Riveron",
 	"license": "ISC",
 	"dependencies": {

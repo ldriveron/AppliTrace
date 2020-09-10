@@ -25,7 +25,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import mdb from './config';
 mongoose
-	.connect(mdb.mongoAtlasUri, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+	.connect(mdb.mongoAtlasUri, { useNewUrlParser: true, useUnifiedTopology: true })
 	.then(() => console.log('MongoDB connected...'))
 	.catch((err) => console.log(err));
 
@@ -61,9 +61,9 @@ server.use(
 	session({
 		name: 'stid',
 		secret: config.SESSION_SECRET,
-		resave: false,
+		resave: true,
 		saveUninitialized: false,
-		cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 }, // 30 days
+		cookie: { maxAge: 1000 * 60 * 60 * 24 * 30, sameSite: true, secure: false }, // 30 days
 		store: new MongoStore({
 			mongooseConnection: mongoose.connection,
 			touchAfter: 24 * 3600,

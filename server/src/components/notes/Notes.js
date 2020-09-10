@@ -44,6 +44,8 @@ class Notes extends Component {
 		// Array to hold notes
 		let notes_to_add = [];
 
+		// Sort the applications list by date applied in order to show the notes in order
+		this.props.apps_list.results.sort((a,b) => a.date_applied.localeCompare(b.date_applied));
 		// Loop through all notes and add to side scroll bar
 		if (this.props.apps_list.total_results != 0) {
 			for (let app = 0; app < this.props.apps_list.results.length; app++) {
@@ -52,7 +54,8 @@ class Notes extends Component {
 				if (
 					term != null
 						? new RegExp(term, 'i').test(this.props.apps_list.results[app].notes) ||
-							new RegExp(term, 'i').test(this.props.apps_list.results[app].company_name)
+							new RegExp(term, 'i').test(this.props.apps_list.results[app].company_name) 
+							&& (this.props.apps_list.results[app].notes != null && this.props.apps_list.results[app].notes != '') 
 						: this.props.apps_list.results[app].notes != '' &&
 							this.props.apps_list.results[app].notes != null
 				) {
@@ -69,9 +72,7 @@ class Notes extends Component {
 								});
 							}}
 							key={
-								this.props.apps_list.results[app].company_name +
-								this.props.apps_list.results[app].date_applied +
-								this.props.apps_list.results[app].title
+								this.props.apps_list.results[app]._id
 							}
 						>
 							<div className="note_title">{this.props.apps_list.results[app].company_name}</div>
@@ -98,6 +99,9 @@ class Notes extends Component {
 		// Fetch all user notes from API
 		api.fetchUserNotes(term).then((notes) => {
 			if (notes.total_results != 0) {
+				// Sort the single notes by date added
+				notes.results.sort((a,b) => a.date_added.localeCompare(b.date_added));
+
 				// Loop through all notes and add to side scroll bar
 				for (let note = 0; note < notes.results.length; note++) {
 					notes_to_add.unshift(
@@ -111,7 +115,7 @@ class Notes extends Component {
 									note: notes.results[note].notes,
 									from: 'notes'
 								})}
-							key={notes.results[note].title + notes.results[note].date_added}
+							key={notes.results[note]._id}
 						>
 							<div className="note_title">{notes.results[note].title}</div>
 							<div className="notes_short_text">
@@ -125,8 +129,9 @@ class Notes extends Component {
 					);
 				}
 			}
+
 			// Set the state with all compiled notes from applications and single submittes notes
-			this.setState({ notes: appnotes.concat(notes_to_add) });
+			this.setState({ notes: notes_to_add.concat(appnotes) });
 		});
 	}
 

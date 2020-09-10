@@ -24,7 +24,7 @@ const ApplicationsList = (props) => {
 		apps.push(
 			<div
 				className="app_holder mouse_pointer"
-				key={props.list.results[app].company_name + props.list.results[app].title}
+				key={props.list.results[app]._id}
 				onClick={() => {
 					setSelectedApp(props.list.results[app]);
 				}}
